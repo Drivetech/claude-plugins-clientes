@@ -1,0 +1,76 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# config.yaml — configuración de ESTA instalación de cargar-viajes-backlog
+#
+# Copia este archivo como `config.yaml` (en esta misma carpeta) y complétalo.
+# El agente también puede escribirlo por ti en la puesta en marcha (Paso 0 del
+# SKILL.md). Un mandante nuevo se agrega con la skill `descubrir-mandante`, que
+# escribe su `mandantes/<nombre>.md` y añade su entrada acá abajo.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Proveedor de correo conectado por MCP: "gmail" u "outlook".
+# Necesario si algún mandante usa intake "correo" o si se responde de vuelta.
+proveedor_correo: gmail
+
+# Empresa de Drivetech de esta instalación.
+# - Si tu cuenta ve UNA sola empresa, déjalo vacío: el MCP la fija solo.
+# - Si ve varias, pon el nombre exacto para fijarla en cada corrida.
+empresa_drivetech: ""
+
+# Marca por defecto para intake "correo" (se puede sobreescribir por mandante).
+# - Gmail: una etiqueta (requiere scope gmail.modify para escribirla).
+# - Outlook: una categoría o carpeta.
+marca_procesado: "DT/backlog-cargado"
+
+# Cuánto hacia atrás buscar solicitudes nuevas en cada corrida.
+ventana_busqueda: "3d"
+
+# false = pedir confirmación antes de cargar (recomendado hasta confiar en el
+# perfil). true = cargar directo sin preguntar.
+auto_crear: false
+
+# Firma con que se cierran los correos de respuesta al mandante.
+firma: |
+  Equipo de Operaciones
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Mandantes: uno por cada cliente/fuente de solicitudes de viaje.
+# Cada uno declara su INTAKE (cómo entran los viajes) y apunta a su
+# especificación de lectura en mandantes/<nombre>.md (la escribe
+# `descubrir-mandante`).
+#
+# intake: "correo"  → una empresa de transporte recibe el pedido por mail.
+# intake: "archivo" → un mandante de carga deja su propio export en una carpeta.
+# ─────────────────────────────────────────────────────────────────────────────
+mandantes:
+
+  # Ejemplo intake CORREO — empresa de transporte que recibe de su mandante
+  # (datos ficticios; ver mandantes/ejemplo.md)
+  - nombre: Ferremax
+    intake: correo
+    correo:
+      # Direcciones desde las que llega la solicitud (una o varias).
+      remitentes:
+        - pedidos@ferremax.ejemplo
+      # Texto que aparece en el asunto para reconocer el correo.
+      asunto_contiene: "Ventanas de entrega"
+      # Marca de procesado (opcional; si falta usa la global de arriba).
+      marca_procesado: "DT/backlog-cargado"
+    # A quién se le responde el estado/asignación. Vacío = no se le responde.
+    responder_a:
+      - pedidos@ferremax.ejemplo
+    copiar_a: []
+    lectura: mandantes/ejemplo.md
+
+  # Ejemplo intake ARCHIVO — mandante de carga sube su propio backlog
+  # - nombre: MiOperacion
+  #   intake: archivo
+  #   archivo:
+  #     # Dónde deja el mandante su export. Una carpeta conectada, un Drive, etc.
+  #     ubicacion: "carpeta:/viajes-entrada"
+  #     # Patrón de nombre para reconocer sus archivos.
+  #     patron: "viajes_*.xlsx"
+  #     # Cómo se marca uno ya cargado: "mover" a subcarpeta, o "sufijo".
+  #     marcar_procesado: "mover:procesados/"
+  #   responder_a: []      # normalmente no se responde en este caso
+  #   copiar_a: []
+  #   lectura: mandantes/mioperacion.md

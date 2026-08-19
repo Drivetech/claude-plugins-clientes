@@ -1,0 +1,18 @@
+{
+  "name": "drivetech-clientes",
+  "owner": {
+    "name": "Drivetech",
+    "email": "ja.ayestaran@drivetech.pro"
+  },
+  "description": "Marketplace público de Drivetech: plugins para que los clientes automaticen su operación con Drivetech (TMS, flota, monitoreo y más).",
+  "plugins": [
+    {
+      "name": "drivetech-tms",
+      "source": "./plugins/drivetech-tms",
+      "displayName": "Operación TMS",
+      "description": "Automatiza la operación diaria sobre el TMS de Drivetech: descubre el formato de viajes de cada mandante (onboarding), los carga al backlog y asigna, y hace el seguimiento intradía (estado, anomalías, auditoría de geocercas). Sirve a mandantes de carga (intake por archivo) y a empresas de transporte (intake por correo).",
+      "category": "logistics",
+      "tags": ["drivetech", "tms", "backlog", "viajes", "seguimiento", "geocercas", "logistica", "transporte"]
+    }
+  ]
+}

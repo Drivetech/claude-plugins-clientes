@@ -66,7 +66,11 @@ Tools de almacenamiento (todas operan sobre la empresa de la sesión):
   completo**, para tocar un solo campo lee primero con `get_backlog_settings(slug)`
   y reenvía el resto igual.
 - **`set_backlog_config`** — config transversal de la empresa (proveedor de correo,
-  marca de procesado por defecto, ventana, firma). Hace merge.
+  marca de procesado por defecto, ventana, firma) y el bloque **`extra`**, donde vive
+  la **plantilla de reporte de estado de la empresa** (`extra.reporte_tipo`): el
+  formato con que se le responde a cualquier mandante que pida reporte. Hace merge,
+  pero `extra` se **reemplaza completo** — para tocar una llave, lee primero y
+  reenvía el resto.
 - **`delete_backlog_mandante`** — deshabilita (soft) un mandante; se reactiva con
   `upsert(enabled=true)`.
 
@@ -518,9 +522,37 @@ aunque tenga `responder_a` (puede querer solo el reporte de estado, o nada).
 
 ### 8.2 · Reporte de estado durante el día (si el mandante lo requiere)
 
-Si el mandante pide reporte de avance, durante la jornada le cuentas cómo van sus
-viajes (frecuencia y datos según su perfil). Un reporte típico separa en tres
-grupos:
+**El formato NO lo inventas: lo lee la plantilla de la empresa.** La config trae
+`extra.reporte_tipo` (Markdown), que es la **base** — estructura, columnas, de dónde
+sale cada dato, reglas de cálculo, semáforo, colores y el sobre del correo. Encima de
+esa base va el **delta del mandante**: si su `spec_md` tiene una sección
+**"Reporte de status: ajustes"**, contiene *solo las diferencias* (columnas que
+agrega o quita, umbrales propios, cómo agrupa el resumen, textos, colores). Base +
+delta, y lo que el delta no menciona se hereda.
+
+Los dos son Markdown opaco: **léelos y aplícalos literal**, no los resumas ni los
+reinterpretes. Si la base pide una columna cuyo dato la plataforma no expone, la
+columna sale marcada como pendiente y se lo dices al usuario — **nunca inventes el
+dato ni dejes la celda en blanco**.
+
+Para armar el reporte, **una sola llamada** trae todo el día:
+
+```
+get_trip_status(date=<día>, group_name=<grupo del mandante>,
+                include=["trailer", "observations", "reception"],
+                include_timestamps=True, limit=200)
+```
+
+Los tres `include` importan: `trailer` da la patente de la rampla, `observations` las
+indicaciones y comentarios de cierre, y `reception` el formulario de recepción con sus
+campos ya resueltos a nombre (números de documento, fotos, firma). Sin ellos esas
+columnas vienen vacías y parecen datos faltantes cuando no lo son. Sube el `limit` si
+el día trae más viajes. Complementa con `get_fleet_vehicles(vehicle_filter=[patentes])`
+cuando la plantilla pida el nombre interno del móvil o su tipo.
+
+**Si la empresa todavía no tiene plantilla** (`extra.reporte_tipo` vacío), usa el
+formato genérico de tres grupos y ofrécele al usuario dejarlo guardado como plantilla
+de la empresa:
 
 - **Realizados** — hora de llegada al destino, hora de salida y **tiempo de
   permanencia** (salida − llegada). Si el mandante lo pide, también la llegada y
@@ -534,13 +566,16 @@ De dónde sale cada dato, con `get_trip_status`:
 
 | Dato | Campo |
 |---|---|
-| Estado / subestado | `state`, `substate` |
-| Hora comprometida | `hour` |
+| Estado / subestado | `state`, `substate`, `substate_reason` |
+| Hora comprometida / de carga | `hour`, `load_datetime` |
 | ETA | `eta` |
 | Llegada y salida del origen | `origin_arrival_datetime`, `origin_departure_datetime` |
 | Llegada y salida del destino | `destiny_arrival_datetime`, `destiny_departure_datetime` |
 | Permanencia en destino | `destiny_departure_datetime` − `destiny_arrival_datetime` |
-| Vehículo y conductor | `vehicle_plate`, `driver_name` |
+| Vehículo y conductor | `vehicle_plate`, `vehicle_name`, `driver_name` |
+| Rampla | `trailer_plate` (con `include=["trailer"]`) |
+| Tipo de viaje | `trip_type` — **tal cual lo entrega el TMS**, no lo traduzcas |
+| Documentos y respaldos | `reception_form` (campo → valor, y `file_url` de las fotos), `form_completed` |
 
 **Con una sola llamada te alcanza.** `get_trip_status` trae los hitos de
 origen/destino también cuando pides varios códigos (o por `date` /
@@ -567,13 +602,19 @@ cuántos quedaron sin dato, en vez de mostrar una columna a medio llenar.
 
 ⚠️ **Un mismo hito puede significar cosas distintas según la operación.** Antes
 de traducir una hora a una frase, revisa qué dice la especificación del mandante:
-según cómo funcione la faena, "llegó al origen" puede ser del día anterior, o
-`load_datetime` puede no existir sin que eso sea un incumplimiento.
+según cómo funcione la faena, "llegó al origen" puede ser del día anterior (camiones
+que pernoctan en planta), o `load_datetime` puede no existir sin que eso sea un
+incumplimiento. Ese es justamente el tipo de cosa que el delta del mandante corrige
+—por ejemplo, medir la permanencia de origen desde `load_datetime` en vez de desde la
+llegada.
 
 ### 8.3 · Antes de enviar
 
-1. Redacta el correo **en el mismo hilo**, breve, con las tablas del reporte y
-   cerrado con la `firma` de la config (`get_backlog_settings`).
+1. Redacta el correo **en el mismo hilo del requerimiento** del mandante, con el
+   saludo, las tablas y el cierre que indique la plantilla, y firmado con la `firma`
+   de la config (`get_backlog_settings`). Si el requerimiento **no llegó por correo**
+   (planilla, carpeta, mensaje, teléfono), arma igual un **borrador nuevo** con el
+   mismo cuerpo y un asunto que identifique mandante y fecha.
 2. Créalo como **borrador de respuesta** y muéstraselo al usuario.
 3. **Nunca lo envíes sin visto bueno.** Es correo que sale de la empresa hacia un
    tercero: el usuario decide si sale y con qué texto. Si la instalación quiere
@@ -613,6 +654,20 @@ Cómo hacerlo, cada vez que el usuario te dé una instrucción así:
 No reescribas ni "mejores" el resto del perfil de paso: toca solo lo que cambió.
 Si dos cambios entran juntos, agrúpalos en un solo `upsert`.
 
+**Un caso especial: los cambios al reporte.** Antes de guardarlo, pregúntate a quién
+le sirve:
+
+- **A este mandante nada más** ("a Easy mándale también la temperatura", "para ellos
+  la permanencia se mide desde la hora de carga") → va al **delta**, en la sección
+  "Reporte de status: ajustes" de su `spec_md`, con `upsert_backlog_mandante`.
+- **A todos** (una columna que faltaba, el color corporativo, el saludo del correo) →
+  va a la **plantilla de la empresa**, `extra.reporte_tipo`, con `set_backlog_config`.
+  Recuerda que `extra` se **reemplaza completo**: lee la config, mezcla tu cambio y
+  reenvía el resto.
+
+Ante la duda, pregunta. Meter en la base algo que era de un solo mandante ensucia el
+reporte de todos; meter en el delta algo que era de todos obliga a repetirlo N veces.
+
 ---
 
 ## Reglas de oro
@@ -650,6 +705,9 @@ Si dos cambios entran juntos, agrúpalos en un solo `upsert`.
 - **Al mandante solo si lo requiere.** La confirmación de asignación y el reporte de
   estado se le mandan **únicamente si su perfil lo pide** y hay `responder_a`. Y
   siempre como borrador: nunca envíes correo sin visto bueno.
+- **El formato del reporte no se improvisa.** Sale de `extra.reporte_tipo` (la
+  plantilla de la empresa) más el delta del mandante, aplicados literal. Lo que la
+  plataforma no expone se marca pendiente; no se inventa.
 - **No proceses dos veces:** marca la solicitud al terminar (etiqueta el correo o
   mueve el archivo a procesados) y filtra por esa marca en la próxima corrida.
 

@@ -213,10 +213,38 @@ asignar" — **no inventes** un criterio.
 ### 6.2 · Comunicación de vuelta
 
 ¿Se le confirma la asignación al mandante? ¿Se le reporta el avance del día, cada
-cuánto y con qué datos (permanencia en destino, hitos de origen)? ¿Qué se hace
-cuando un viaje se atrasa? ¿A quién se le responde (`responder_a`) y quién va en
-copia? Si esta operación no le reporta a nadie (p.ej. un mandante de carga que
-sube su propio backlog), déjalo explícito y `responder_a` vacío.
+cuánto? ¿Qué se hace cuando un viaje se atrasa? ¿A quién se le responde
+(`responder_a`) y quién va en copia? Si esta operación no le reporta a nadie (p.ej.
+un mandante de carga que sube su propio backlog), déjalo explícito y `responder_a`
+vacío.
+
+**El reporte de estado se arma con la plantilla de la empresa, no con una nueva.**
+La config trae `extra.reporte_tipo`: el formato con que esta empresa le responde a
+todos sus mandantes (estructura, columnas, reglas, colores, sobre del correo).
+Léelo antes de preguntar, y pregunta solo por lo que este mandante hace **distinto**:
+
+- ¿Le sirve el reporte tal cual, o necesita **columnas** extra (y de dónde saldría
+  ese dato) o quitar alguna que no aplica?
+- ¿Sus **umbrales** son otros? Ojo con la permanencia en origen: si los camiones
+  pernoctan en planta, medirla desde la llegada infla todo y hay que medirla desde
+  la hora comprometida de carga.
+- ¿Cómo le sirve el **resumen** — por ruta, por origen, por estado, o sin resumen?
+- ¿Tiene **textos** propios (saludo, asunto, cierre), otra **frecuencia**, o exige su
+  propia **marca** en vez de la de la empresa?
+
+Lo que sea distinto se guarda en el `spec_md` como una sección titulada
+**"Reporte de status: ajustes"**, con **solo las diferencias** y anotando contra qué
+versión de la plantilla base se escribió. Lo que no se menciona, se hereda. Si el
+mandante quiere el reporte tal cual, escríbelo así de explícito y no agregues la
+sección.
+
+Si el mandante pide algo que **la plataforma no expone**, no lo prometas: déjalo
+anotado como pendiente y avísale al usuario.
+
+Y si lo que el mandante pide en realidad **le sirve a todos** (un dato que faltaba,
+un arreglo del formato), eso no es delta: proponle al usuario subirlo a la plantilla
+de la empresa con `set_backlog_config` (recordando que `extra` se reemplaza completo:
+lee, mezcla y reenvía).
 
 ### 6.3 · Trampas de la faena
 
@@ -249,7 +277,11 @@ antes de guardar nada.** Después **guárdalo en el backend de Drivetech** con
   matriz de la semana. Se guarda **byte-idéntico** — no lo normalices.
 
 Si además falta config transversal de la empresa (proveedor de correo, marca de
-procesado por defecto, ventana, firma), guárdala con `set_backlog_config`.
+procesado por defecto, ventana, firma, y la plantilla de reporte `extra.reporte_tipo`),
+guárdala con `set_backlog_config`. Si la empresa **todavía no tiene plantilla de
+reporte** y este mandante quiere reporte, ese es el momento de armarla: pídele al
+usuario un reporte real que ya esté mandando, reprodúcelo, y guárdalo como plantilla
+de la empresa — no como algo privado de este mandante.
 
 El perfil vive **en el backend, por empresa** — sobrevive a updates del plugin, al
 entorno efímero y al cambio de máquina, y Drivetech lo administra central. (Si esa
@@ -280,4 +312,6 @@ dando instrucciones (ver su Paso 9).
 - **Escribe reglas, no listas que cambian.** Patentes, conductores y dotación
   salen del catálogo en el momento, no del perfil.
 - **Confirma el perfil antes de escribirlo**, y valida con una carga de prueba.
+- **El reporte se hereda de la empresa.** En el perfil va solo el delta del mandante,
+  nunca una copia de la plantilla.
 - **El perfil vive con la skill de carga**, no dentro de esta.

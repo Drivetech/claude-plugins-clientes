@@ -53,10 +53,18 @@ entre candidatos, y qué es fijo vs. qué se decide cada día. Lo que no esté
 definido: "preguntar al usuario al asignar" — nunca lo inventes.
 
 **9 · Comunicación con el mandante.** Qué se confirma al asignar; si hay reporte
-de avance, cada cuánto y con qué datos (¿permanencia en destino? ¿hitos de
-origen?); qué se informa ante un atraso; a quién se responde. Incluye cómo se
-leen los hitos en esta operación si tienen una lectura especial (p.ej. origen que
-es de la propia empresa y por eso `origin_arrival_datetime` es del día anterior).
+de avance y cada cuánto; qué se informa ante un atraso; a quién se responde.
+Incluye cómo se leen los hitos en esta operación si tienen una lectura especial
+(p.ej. origen que es de la propia empresa y por eso `origin_arrival_datetime` es del
+día anterior).
+
+El **formato** del reporte no va acá: sale de la plantilla de la empresa
+(`extra.reporte_tipo` en la config). Lo que este mandante hace distinto va en una
+subsección titulada **"Reporte de status: ajustes"**, con solo las diferencias
+—columnas que agrega o quita (declarando de dónde sale el dato), umbrales propios,
+cómo agrupa el resumen, orden del detalle, textos del correo, colores— y anotando
+contra qué versión de la plantilla se escribió. Lo que no se menciona, se hereda.
+Si el mandante usa el reporte tal cual, escríbelo explícito y no pongas la subsección.
 
 **10 · Particularidades.** Cualquier cosa propia: que se equivocan con el número
 de guía seguido, formatos de carga mezclados, faenas sin conductores propios en

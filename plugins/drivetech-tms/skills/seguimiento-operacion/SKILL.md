@@ -162,11 +162,19 @@ Según a quién sea (puede ser a los dos):
 
 - **Interno (empresa de transporte):** panorama + lista de anomalías con su causa
   probable y qué revisar. Directo y accionable.
-- **Al mandante:** arma el estado **según las reglas de comunicación del perfil**
-  (`spec_md`): qué datos quiere (¿permanencia? ¿hitos de origen?), cada cuánto, y
-  cómo se leen los hitos en esa operación. Déjalo como **borrador** a `responder_a`
-  y **no lo envíes sin visto bueno**. Si `responder_a` está vacío, esta operación no
-  le reporta a un tercero: sáltatelo.
+- **Al mandante:** el formato **no lo inventas**. Sale de la **plantilla de la
+  empresa** (`extra.reporte_tipo` en la config, vía `get_backlog_settings`) más el
+  **delta del mandante** —la sección "Reporte de status: ajustes" de su `spec_md`,
+  que trae solo las diferencias—. Ambos son Markdown opaco: aplícalos literal. Para
+  llenarlo, pide el día con
+  `get_trip_status(date=…, group_name=…, include=["trailer","observations","reception"],
+  include_timestamps=True)`, que en una sola llamada trae hitos, rampla,
+  observaciones y formulario de recepción. El `spec_md` manda además cada cuánto se
+  reporta y cómo se leen los hitos en esa operación. Déjalo como **borrador** en el
+  hilo del mandante a `responder_a` y **no lo envíes sin visto bueno**. Si
+  `responder_a` está vacío, esta operación no le reporta a un tercero: sáltatelo.
+  Si la empresa aún no tiene plantilla, arma el estado con las reglas del perfil y
+  ofrece dejar el formato guardado como plantilla de la empresa.
 
 En todos los casos: un hito ausente se informa como dato faltante, y una anomalía
 que resultó ser problema de geocerca se dice como tal, no como incumplimiento del
@@ -197,4 +205,6 @@ On-demand ("¿cómo va la operación?", "revisa los viajes de hoy", "audita el
 - **No concluyas con GPS caído.** `gps_sin_reportar` = no se puede afirmar nada.
 - **No edites la operación.** Propón; el usuario cierra/reasigna en la plataforma.
 - **Nombres y umbrales del perfil.** Lo que el mandante definió manda sobre los defaults.
+- **El reporte al mandante sale de la plantilla de la empresa + su delta**, nunca de
+  un formato improvisado.
 - **Al mandante, siempre borrador.** Nunca envías sin visto bueno.

@@ -53,6 +53,31 @@ cliente, fíjala con `select_enterprise`. Si ve una sola, no hay nada que hacer.
 
 ---
 
+## Paso 0 · ¿Mandante nuevo o re-descubrimiento?
+
+**Antes de mirar la primera muestra, averigua si ese mandante ya existe.** Llama a
+`get_backlog_settings` (sin `slug`) y búscalo en la lista.
+
+- **No está** → mandante nuevo. Sigue en el Paso 1 y descubre todo.
+- **Ya está** → es un **re-descubrimiento** (cambió el formato, o el perfil quedó
+  mal). Trae el perfil completo con `get_backlog_settings(slug=…)` y **guarda el
+  `spec_md` vigente antes de tocar nada.** Ese texto no es un borrador tuyo: tiene
+  meses de reglas que el usuario fue dando operando (Paso 9 de la skill de carga) y
+  que **no se descubren mirando una muestra**.
+
+En un re-descubrimiento lo que cambia es **cómo se lee** el mandante (secciones 1–3
+del perfil, a veces 4–6). Todo lo demás —criterio de asignación, comunicación,
+trampas de la faena, reglas aprendidas en operación— **se preserva salvo que el
+usuario diga explícitamente lo contrario**. Dilo en voz alta al empezar:
+
+> *"Ferremax ya está configurado (v7). Voy a rehacer la parte de lectura y dejar
+> intactas las reglas de asignación y lo aprendido en operación."*
+
+Y no rehagas la entrevista del Paso 6 desde cero: léele al usuario lo que ya está
+escrito y pregúntale **solo si algo de eso cambió**.
+
+---
+
 ## Paso 1 · Conseguir las muestras y definir el intake
 
 Pídele al usuario una muestra real del mandante nuevo. El **contenido** puede
@@ -71,9 +96,26 @@ es distinto de en qué formato vienen:
   Drive o adjunto (caso mandante de carga que sube su propio backlog). Anota la
   ubicación, el patrón de nombre y cómo se marcará uno ya cargado.
 
-Si el formato cambia entre envíos, pide varias muestras. Anota el **nombre del
-mandante** (cómo lo va a llamar el cliente) — con eso nombras el archivo
-`mandantes/<nombre>.md`.
+Si el formato cambia entre envíos, pide varias muestras.
+
+### Identidad: con qué nombres aparece escrito
+
+Anota el **nombre del mandante** (cómo lo va a llamar el cliente) — de ahí sale su
+`slug` en el backend. Y pregunta además, aunque sean **opcionales**:
+
+- **Razón social** — el nombre legal, el que va impreso en los documentos.
+- **RUT**.
+- **Otros nombres** con que aparece: planta, local, alias interno del mandante.
+
+**Dile para qué es, no lo pidas a secas.** No es burocracia: el nombre del TMS y el
+del papel casi nunca son el mismo. Una guía de despacho puede decir *"Embotelladora
+Andina S.A."* mientras el TMS llama a ese lugar *"Rancagua KOA"* — si la razón social
+no está guardada, una verificación documental los lee como dos entidades distintas y
+rechaza guías que estaban buenas.
+
+Si el usuario no los tiene a mano, **no lo trabes**: anótalos como **duda abierta**
+(§11 del perfil) y sigue. Va en la sección **0 · Identidad del mandante** del
+`spec_md`.
 
 ## Paso 2 · Normalizar a una tabla canónica
 
@@ -269,12 +311,47 @@ antes de guardar nada.** Después **guárdalo en el backend de Drivetech** con
   `asunto_contiene`; archivo: `ubicacion`, `patron`, `marcar_procesado`).
 - `responder_a` / `copiar_a` (si se le responde).
 - **`spec_md`** — la especificación de lectura completa en Markdown, siguiendo la
-  anatomía de `references/esquema-perfil.md` y usando `mandantes/ejemplo.md` como
-  referencia de uno bien hecho. Incluye mapeo, constantes, regla de origen,
+  anatomía de `references/esquema-perfil.md` (el **contrato** del `spec_md`, que
+  también leen la skill de carga y la de seguimiento) y usando `mandantes/ejemplo.md`
+  como referencia de uno bien hecho. Arranca con el **encabezado del perfil**
+  (`esquema`, `actualizado`) que ese contrato define, para que quien lo lea después
+  sepa contra qué versión fue escrito. Incluye mapeo, constantes, regla de origen,
   característica, **criterio de asignación** y **comunicación** — todo el know-how
   del mandante va acá. Escribe **reglas, no listas de datos** que cambian: la regla
   para reconocer un tracto, no la lista de patentes; el criterio de rotación, no la
   matriz de la semana. Se guarda **byte-idéntico** — no lo normalices.
+
+### Si es un re-descubrimiento: read-modify-write
+
+`upsert_backlog_mandante` **reemplaza el perfil completo**. Si mandas solo lo que
+descubriste hoy, borras todo lo demás. Entonces:
+
+1. Parte del **`spec_md` vigente** que trajiste en el Paso 0, no de una hoja en
+   blanco.
+2. Reescribe **solo** las secciones que cambiaron (normalmente 1–3). El resto va
+   **byte-idéntico**, incluidas las "Reglas aprendidas en operación".
+3. Reenvía **todos** los campos del perfil (`intake`, `intake_config`,
+   `responder_a`, `copiar_a`, `enabled`), no solo los que tocaste. No mandes
+   `version`: el backend versiona solo.
+4. Antes de guardar, **muéstrale al usuario el diff en palabras** —qué secciones
+   cambian y qué queda igual— y confirma. Después dile en qué versión quedó:
+   *"Perfil de Ferremax actualizado (v8): cambió el formato de la tabla; asignación
+   y comunicación quedaron igual."*
+
+Si algo salió mal, el backend guarda las versiones anteriores:
+`get_backlog_settings(slug=…, history=true)`.
+
+### Lo que quedó sin resolver va escrito, no en tu memoria
+
+Todo lo que marcaste como duda en el camino y **no** lograste cerrar —un código que
+no está en ningún catálogo, una columna que nadie supo explicar, un criterio de
+asignación que el usuario todavía no tiene definido— va en la sección **"Dudas
+abiertas"** del `spec_md`, diciendo quién la tiene que resolver. Si no queda escrita
+ahí, se pierde al cerrar la sesión y la vuelve a descubrir el operador a las 7 de la
+mañana, con los camiones esperando.
+
+Un perfil con dudas abiertas declaradas sirve. Un perfil con dudas tapadas por un
+supuesto, no.
 
 Si además falta config transversal de la empresa (proveedor de correo, marca de
 procesado por defecto, ventana, firma, y la plantilla de reporte `extra.reporte_tipo`),
@@ -290,6 +367,21 @@ instalación no tiene backend, cae al modo archivo: `mandantes/<nombre>.md` +
 
 ## Paso 8 · Cierre
 
+### Si el mandante entrega guía de despacho
+
+Es lo que sigue, pero **no ahora**: un mandante recién configurado todavía no tiene
+guías suyas en el sistema — el papel firmado aparece cuando empieza a operar. Cuando
+ya tenga algunas, el formato de su guía se descubre **aparte**, con la skill
+**`descubrir-guia-despacho`** si esta instalación la tiene, que produce el
+`document_spec` del mandante: dónde va el folio, el código de cliente, la tabla de
+ítems. Es otra especificación y se rehace en otro momento — **ésta** cuando el
+mandante cambia *cómo pide viajes*, **aquélla** cuando cambia *su formulario*.
+
+Menciónaselo al usuario al cerrar, para que sepa que existe y cuándo volver. No lo
+intentes acá: sin guías reales del mandante no hay nada que descubrir.
+
+### El cierre
+
 Dile al usuario que el mandante quedó **completo** — formato + reglas de
 asignación + comunicación — y que **de ahora en adelante la operación diaria es
 solo cargar y asignar** con la skill `cargar-viajes-backlog`. Recuérdale validar
@@ -303,6 +395,9 @@ dando instrucciones (ver su Paso 9).
 ## Reglas de oro
 
 - **Muestras reales, no descripciones.** Lee el archivo/correo de verdad.
+- **Pregunta razón social y RUT** aunque sean opcionales: son los nombres con que el
+  mandante aparece en el papel. Sin ellos, la verificación documental rechaza guías
+  correctas. Si no los tiene, van como duda abierta.
 - **Nunca inventes catálogo.** `get_tms_catalog` resuelve; lo que no aparece se
   pregunta.
 - **`code` es la llave de idempotencia.** Identifícala bien y mándala tal cual.
@@ -312,6 +407,11 @@ dando instrucciones (ver su Paso 9).
 - **Escribe reglas, no listas que cambian.** Patentes, conductores y dotación
   salen del catálogo en el momento, no del perfil.
 - **Confirma el perfil antes de escribirlo**, y valida con una carga de prueba.
+- **Un mandante que ya existe se edita, no se reescribe.** `upsert` reemplaza el
+  perfil completo: parte del `spec_md` vigente y preserva asignación, comunicación
+  y lo aprendido en operación.
+- **Lo que quedó en duda se escribe** en la sección "Dudas abiertas" del perfil, con
+  quién la resuelve. Una duda no escrita se pierde.
 - **El reporte se hereda de la empresa.** En el perfil va solo el delta del mandante,
   nunca una copia de la plantilla.
 - **El perfil vive con la skill de carga**, no dentro de esta.

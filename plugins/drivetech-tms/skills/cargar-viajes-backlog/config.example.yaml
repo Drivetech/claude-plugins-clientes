@@ -1,10 +1,20 @@
 # ─────────────────────────────────────────────────────────────────────────────
-# config.yaml — configuración de ESTA instalación de cargar-viajes-backlog
+# config.yaml — MODO FALLBACK (instalaciones sin backend)
 #
-# Copia este archivo como `config.yaml` (en esta misma carpeta) y complétalo.
-# El agente también puede escribirlo por ti en la puesta en marcha (Paso 0 del
-# SKILL.md). Un mandante nuevo se agrega con la skill `descubrir-mandante`, que
-# escribe su `mandantes/<nombre>.md` y añade su entrada acá abajo.
+# ⚠️  Normalmente NO necesitas este archivo.
+#
+# La fuente de verdad es el **backend de Drivetech**: la config de la empresa se
+# lee y escribe con `get_backlog_settings` / `set_backlog_config`, y el perfil de
+# cada mandante (su `spec_md`) con `upsert_backlog_mandante`. Así sobrevive a los
+# updates del plugin, vale en cualquier equipo y queda versionado.
+#
+# Este archivo es la caída para una instalación cuyo MCP **no expone** esas tools.
+# En ese caso: cópialo como `config.yaml` en la carpeta de datos del cliente
+# (`./drivetech-tms/` o `~/.drivetech-tms/`, NUNCA dentro del plugin — un update lo
+# pisaría) y complétalo. Los perfiles van junto a él, en `mandantes/<nombre>.md`,
+# con la anatomía de `descubrir-mandante/references/esquema-perfil.md`.
+#
+# El flujo del SKILL.md es idéntico en los dos modos.
 # ─────────────────────────────────────────────────────────────────────────────
 
 # Proveedor de correo conectado por MCP: "gmail" u "outlook".

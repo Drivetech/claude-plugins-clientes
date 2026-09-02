@@ -1,16 +1,55 @@
-# Anatomía de un perfil de mandante (`mandantes/<nombre>.md`)
+# Anatomía de un perfil de mandante — contrato del `spec_md`
 
-Un perfil es un archivo Markdown que le dice a la skill de carga **cómo se lee un
-mandante y cómo se traduce su solicitud a viajes del backlog**. Es lo único que
-cambia de un mandante a otro; el flujo vive en el `SKILL.md` de la skill de carga
-y es igual para todos.
+**Este archivo es el contrato del `spec_md`, no documentación de una sola skill.**
+Lo escribe `descubrir-mandante`, lo lee literal `cargar-viajes-backlog` (para
+mapear, cargar y asignar) y lo consulta `seguimiento-operacion` (umbrales, hitos y
+reporte). Cualquiera de las tres que necesite saber qué forma tiene un perfil, mira
+acá. **Si cambia el contrato, sube `esquema` y revisa las tres.**
+
+Un perfil es un Markdown que dice **cómo se lee un mandante y cómo se traduce su
+solicitud a viajes del backlog**. Es lo único que cambia de un mandante a otro; el
+flujo vive en los `SKILL.md` y es igual para todos. Se guarda en el backend, en el
+campo `spec_md` del mandante (`upsert_backlog_mandante`); en instalaciones sin
+backend, como `mandantes/<nombre>.md`.
 
 Toma `cargar-viajes-backlog/mandantes/ejemplo.md` como el ejemplo de referencia de
 uno bien hecho. Esta es la anatomía a completar. No todas las secciones aplican a
 todos los mandantes — omite las que no correspondan, pero no omitas una por no
 haber preguntado.
 
+## Encabezado del perfil
+
+Todo `spec_md` arranca con este bloque, para que quien lo lea sepa contra qué
+contrato fue escrito:
+
+```
+# Lectura del requerimiento — <Mandante>
+
+> esquema: v1 · actualizado: <YYYY-MM-DD>
+```
+
+**`esquema` es la versión de este documento**, no la del perfil (esa la lleva el
+backend y sube sola en cada `upsert`). Hoy el contrato es **v1**.
+
+- Si un perfil trae un `esquema` **menor** que el de acá, fue escrito contra un
+  contrato viejo: léelo igual, pero avísale al usuario que conviene rehacerlo con
+  `descubrir-mandante`.
+- Si **no** trae `esquema`, asúmelo v1.
+- Al editar un perfil (Paso 9 de la skill de carga, o un re-descubrimiento),
+  actualiza `actualizado` y deja `esquema` como está — salvo que hayas reescrito el
+  perfil entero contra el contrato nuevo.
+
 ## Secciones
+
+**0 · Identidad del mandante.** Cómo se llama en el TMS y **con qué otros nombres
+aparece escrito**, sobre todo en papel: **razón social**, **RUT**, y cualquier alias
+o nombre de planta/local con que sale impreso. Razón social y RUT son opcionales,
+pero **se preguntan siempre**: son lo que permite reconocer al mandante cuando el
+nombre del documento no es el del sistema. Una guía que dice *"Embotelladora Andina
+S.A."* mientras el TMS llama a ese lugar *"Rancagua KOA"* es el mismo lugar — sin la
+razón social guardada, una verificación documental los lee como distintos y rechaza
+guías correctas. Lo que el usuario no tenga a mano va a §11 como duda abierta, nunca
+en blanco.
 
 **1 · Cómo se reconoce la solicitud.** Según el intake: para `correo`, asunto y
 remitente; para `archivo`, la ubicación y el patrón de nombre. La forma del
@@ -62,13 +101,33 @@ El **formato** del reporte no va acá: sale de la plantilla de la empresa
 (`extra.reporte_tipo` en la config). Lo que este mandante hace distinto va en una
 subsección titulada **"Reporte de status: ajustes"**, con solo las diferencias
 —columnas que agrega o quita (declarando de dónde sale el dato), umbrales propios,
-cómo agrupa el resumen, orden del detalle, textos del correo, colores— y anotando
-contra qué versión de la plantilla se escribió. Lo que no se menciona, se hereda.
-Si el mandante usa el reporte tal cual, escríbelo explícito y no pongas la subsección.
+cómo agrupa el resumen, orden del detalle, textos del correo, colores— y abriendo la
+subsección con una línea `> reporte_base: <versión o fecha de extra.reporte_tipo>`
+que declare contra qué versión de la plantilla se escribió el delta. Lo que no se
+menciona, se hereda. Si el mandante usa el reporte tal cual, escríbelo explícito y
+no pongas la subsección.
 
 **10 · Particularidades.** Cualquier cosa propia: que se equivocan con el número
 de guía seguido, formatos de carga mezclados, faenas sin conductores propios en
 ciertas consultas, etc.
+
+**11 · Dudas abiertas.** Lo que quedó sin resolver y **hay que preguntar**: un
+código que no aparece en ningún catálogo, una columna que nadie supo explicar, un
+criterio de asignación que el usuario todavía no tiene definido. Una línea por duda,
+con **quién la resuelve** y **desde cuándo está abierta**:
+
+```
+- [ ] El destino `88231` no está en el catálogo de clientes. ¿Tienda nueva o typo
+      del mandante? — preguntar a Operaciones (abierta 2026-09-02).
+- [ ] No hay regla para desempatar cuando dos conductores califican igual;
+      hoy se pregunta al asignar — definir con el usuario (abierta 2026-09-02).
+```
+
+Una duda escrita acá **sobrevive a la sesión**; una duda que quedó solo en la
+conversación se pierde y la vuelve a descubrir el operador a las 7 de la mañana. Se
+cierran igual que se abren: cuando el usuario la responde operando, la regla pasa a
+la sección que corresponda y la línea se borra de acá (Paso 9 de la skill de carga).
+Si no hay dudas, escribe "Ninguna" — el silencio se lee como olvido.
 
 ## Campos de `create_backlog_trips`
 
@@ -98,3 +157,7 @@ salvo que la operación lo requiera explícitamente.
   es supuesto por confirmar.
 - **Explícito sobre lo ausente.** Si algo no aplica (características vacías,
   sin reporte de avance acordado), escríbelo — el silencio se lee como olvido.
+- **Un re-descubrimiento no empieza en blanco.** Cambiar el formato de un mandante
+  toca las secciones 1–3 (y a veces 4–6). Las secciones 8, 9 y 10, más "Reglas
+  aprendidas en operación", son know-how ganado operando: se preservan
+  byte-idénticas salvo que el usuario diga lo contrario.

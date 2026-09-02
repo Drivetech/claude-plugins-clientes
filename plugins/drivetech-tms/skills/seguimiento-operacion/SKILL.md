@@ -30,7 +30,9 @@ y de ahí el reporte interno o para el mandante.
   es la esperada, `select_enterprise`) — la selección se pierde sola.
 - El **perfil del mandante** (`get_backlog_settings(slug=…)`) trae, en su `spec_md`,
   cómo se lee esta operación (qué hitos importan, umbrales propios, qué quiere ver
-  el mandante en el reporte). Léelo antes de interpretar tiempos.
+  el mandante en el reporte). Léelo antes de interpretar tiempos. Qué secciones tiene
+  ese perfil está en el contrato compartido,
+  `descubrir-mandante/references/esquema-perfil.md`.
 
 ## Idea base — hito ausente ≠ incumplimiento
 

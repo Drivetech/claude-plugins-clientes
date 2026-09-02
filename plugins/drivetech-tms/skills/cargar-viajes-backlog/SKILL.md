@@ -78,6 +78,13 @@ Tools de almacenamiento (todas operan sobre la empresa de la sesión):
 carga. No lo interpretes, no lo resumas, no lo reescribas al pasarlo — se guarda y
 vuelve byte-idéntico.
 
+Su forma la define un solo lugar, compartido por las tres skills:
+**`descubrir-mandante/references/esquema-perfil.md`** — qué secciones tiene un
+perfil, el encabezado `esquema: vN` con que arranca, y la tabla de campos de
+`create_backlog_trips`. Míralo ahí en vez de deducirlo del perfil que te tocó. Si un
+perfil trae un `esquema` menor que el del contrato, léelo igual pero avísale al
+usuario que conviene rehacerlo con `descubrir-mandante`.
+
 Si el MCP de Drivetech **no expone** estas tools (instalación sin backend), cae al
 modo archivo: `config.yaml` y `mandantes/*.md` en una carpeta de datos fuera del
 plugin (`./drivetech-tms/` o `~/.drivetech-tms/`), usando `config.example.yaml` y
@@ -648,8 +655,18 @@ Cómo hacerlo, cada vez que el usuario te dé una instrucción así:
    edita el `spec_md` (agrega/ajusta esa regla, deja el resto **byte-idéntico**) y
    guárdalo con `upsert_backlog_mandante` reenviando todos los campos. El backend
    sube la versión y deja snapshot solo — no mandes `version`.
-4. **Confírmalo en una línea**: *"Anotado en el perfil de \<mandante\> (v\<N\>):
+4. **Actualiza la fecha** del encabezado del perfil (`actualizado: YYYY-MM-DD`).
+   `esquema` no se toca.
+5. **Confírmalo en una línea**: *"Anotado en el perfil de \<mandante\> (v\<N\>):
    \<regla\>"*, para que el usuario sepa que quedó guardado y desde cuándo.
+
+**Las dudas abiertas se cierran igual.** El perfil trae una sección **"Dudas
+abiertas"** con lo que quedó sin resolver en el descubrimiento (un destino que no
+está en el catálogo, un criterio que nadie tenía definido). Cuando el usuario
+conteste una de ellas operando, hazlo en el mismo `upsert`: escribe la regla en la
+sección que corresponda y **borra la línea de "Dudas abiertas"**. Y al revés — si
+operando aparece una pregunta que el usuario no puede contestar ahora, **agrégala
+ahí** en vez de dejarla en la conversación: la próxima corrida es otra sesión.
 
 No reescribas ni "mejores" el resto del perfil de paso: toca solo lo que cambió.
 Si dos cambios entran juntos, agrúpalos en un solo `upsert`.
@@ -683,6 +700,9 @@ reporte de todos; meter en el delta algo que era de todos obliga a repetirlo N v
 - **Lo que se aprende se guarda (Paso 9).** Toda regla nueva de un mandante va al
   `spec_md` en el backend vía `upsert_backlog_mandante`. Nada de know-how operativo
   se queda solo en la memoria de la sesión.
+- **El perfil se edita, nunca se pisa.** `upsert_backlog_mandante` reemplaza el
+  perfil completo: lee con `get_backlog_settings(slug)`, cambia solo lo que cambió y
+  reenvía el resto byte-idéntico.
 - **Confirma antes de crear** salvo que `auto_crear = true`.
 - **Las características que el viaje exija se respetan siempre.** El vehículo
   tiene que cumplir las `skills_required` del viaje: ningún criterio de mandante
@@ -715,49 +735,24 @@ reporte de todos; meter en el delta algo que era de todos obliga a repetirlo N v
 
 ## Cómo agregar un mandante nuevo
 
-Lo mejor es usar la skill **`descubrir-mandante`**, que hace justo esto: lee
-muestras reales, infiere el mapeo, lo valida contra el catálogo y una carga de
-prueba, y guarda el perfil con `upsert_backlog_mandante`. Si lo haces a mano, no se
-toca `SKILL.md`; son dos cosas:
+Usa la skill **`descubrir-mandante`**. Hace justo esto y no hay una versión corta
+que valga la pena: lee muestras reales, infiere el mapeo campo por campo, lo valida
+contra el catálogo y contra una carga de prueba, entrevista al usuario por las
+reglas de asignación y comunicación, y guarda el perfil con
+`upsert_backlog_mandante`. Si el mandante **ya existe** (cambió de formato), esa
+skill parte del perfil vigente y preserva lo aprendido en operación.
 
-**1. Arma el `spec_md` del mandante.** Pídele al usuario **una muestra real ya
-recibida** (correo o archivo, según el intake) y trabaja sobre eso — no sobre lo
-que él te cuente que trae. El `spec_md` tiene que responder:
+`SKILL.md` no se toca al agregar un mandante — todo lo que cambia entre mandantes
+vive en su `spec_md`.
 
-- Cómo se reconoce la solicitud (asunto/remitente para correo; patrón de nombre y
-  ubicación para archivo) y la forma del contenido.
-- El formato de la solicitud (tabla, lista, adjunto) y qué es una fila.
-- El **mapeo campo por campo** a `create_backlog_trips`, incluido cuál columna es
-  el `code`.
-- Las **constantes** de esa operación (`type`, `group_name`, `items`, origen por
-  defecto).
-- Si esa operación **usa características de vehículo** (S28/C14 o equivalentes) o
-  no. No lo adivines: léelo de `get_tms_catalog kind=vehicle_skills` — el flag
-  `skills_enabled` dice si son obligatorias, y la lista te sirve para resolver
-  tokens del archivo que calcen con una característica. Si no las usa,
-  `skills_required` va vacío y cualquier móvil califica; déjalo escrito para que
-  nadie después lo lea como un dato que falta.
-- Las demás **reglas propias**: reglas de origen, qué ventanas son primera y
-  segunda vuelta, y las trampas de la faena.
-- La **comunicación de vuelta**: qué se le confirma al asignar, cada cuánto se le
-  reporta el avance del día, qué datos quiere en ese reporte (¿permanencia?
-  ¿hitos de origen?) y qué se hace cuando un viaje se atrasa.
+Si por alguna razón lo armas a mano, la forma del perfil (secciones, encabezado
+`esquema`, campos de `create_backlog_trips`) está en
+**`descubrir-mandante/references/esquema-perfil.md`**, y `mandantes/ejemplo.md` es
+un perfil bien hecho para copiar. Lo mínimo que no puedes saltarte:
 
-Esa última parte pregúntala explícitamente: es la que más varía entre mandantes y
-la que no se deduce mirando un correo de solicitud.
-
-Propónle el mapeo al usuario y **hazlo confirmar** antes de guardar. Lo que no
-reconozcas, pregúntalo: nunca lo adivines.
-
-**2. Guarda el perfil con `upsert_backlog_mandante`**: `slug`, `nombre`, `intake`
-(correo: `remitentes`, `asunto_contiene`; archivo: `ubicacion`, `patron`,
-`marcar_procesado`), `responder_a`/`copiar_a` (si se le responde) y el `spec_md`
-que armaste. La empresa es la de la sesión; el backend versiona solo.
-
-Después valida con una carga real chica:
-
-1. Un solo viaje con `dry_run=true`, después real, y **revisa en la plataforma**
-   que la **hora comprometida** se vea como en la solicitud. Si aparece corrida,
-   estás convirtiendo la hora dos veces.
-2. Que las constantes y las reglas de origen hayan quedado como esperabas, y que
-   `skills_required` refleje el tipo de vehículo.
+- Trabaja sobre **una muestra real ya recibida**, no sobre lo que el usuario te
+  cuente que trae.
+- Hazle **confirmar el mapeo** antes de guardar; lo que no reconozcas, pregúntalo.
+- Valida con **un viaje** (`dry_run=true`, después real) y **revisa en la
+  plataforma** que la hora comprometida se vea como en la solicitud. Si aparece
+  corrida, estás convirtiendo la hora dos veces.

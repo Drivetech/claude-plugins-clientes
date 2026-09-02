@@ -1,5 +1,7 @@
 # Lectura del requerimiento — Ferremax (ejemplo)
 
+> esquema: v1 · actualizado: 2026-09-02
+
 > **Ejemplo ficticio.** "Ferremax" es un retail inventado y "Transportes Andes"
 > una empresa de transporte inventada; los códigos, patentes y correos son de
 > muestra. Sirve como referencia de un perfil bien hecho: cópialo y reemplázalo
@@ -11,6 +13,18 @@ solicitud, confirmar, cargar, asignar, responder) vive en `SKILL.md` y es igual
 para todos.
 
 ---
+
+## 0 · Identidad del mandante
+
+| | |
+|---|---|
+| **Nombre en el TMS** | Ferremax |
+| **Razón social** | Comercial Ferremax S.A. |
+| **RUT** | 76543210-9 |
+| **Otros nombres con que aparece** | "Ferremax Retail" en sus correos; "CD Ferremax Pudahuel" en los documentos del centro de distribución |
+
+Los documentos de esta operación vienen a nombre de la **razón social**, no del
+nombre corto del TMS. Los dos son el mismo mandante.
 
 ## 1 · Cómo se reconoce el correo
 
@@ -218,3 +232,15 @@ sin dato.
   `get_assignable_resources` puede devolver vehículos y `drivers: []` cuando la
   llamas acotada con `search`. Llámala sin `search` para ver la dotación
   completa.
+
+## 11 · Dudas abiertas
+
+- [ ] El destino `88231` apareció en la muestra del 28-08 y **no está en el
+      catálogo de clientes**. ¿Tienda nueva o typo del mandante? — preguntar a
+      Ferremax antes de la próxima carga que lo traiga (abierta 2026-08-28).
+- [ ] No hay regla escrita para desempatar cuando dos conductores califican igual
+      y ninguno tiene la tienda asignada por rotación; hoy **se pregunta al
+      asignar** — definir con el jefe de operaciones (abierta 2026-08-28).
+
+Cuando una de estas se responda, la regla se escribe en la sección que corresponda
+(§8 si es de asignación, §5 si es de origen, etc.) y la línea se borra de acá.

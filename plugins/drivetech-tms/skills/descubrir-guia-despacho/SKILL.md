@@ -151,6 +151,22 @@ Lo que más se olvida:
 Con varias muestras, **contrasta**: lo que aparece igual en todas es del formulario;
 lo que cambia es del documento. No escribas como regla lo que viste una sola vez.
 
+### La trampa: una estructura repetida no significa que la operación la use
+
+Un formulario con cuatro columnas de "Destinatario" **parece** admitir cuatro destinos.
+En la práctica puede que las cuatro sean **la misma tienda** — grupos de guías de una
+sola entrega. Y eso **no se puede saber mirando un documento**: se sabe preguntando, o
+viendo dos.
+
+Vale para cualquier estructura que se repita —columnas, bloques, filas de destino—: un
+formulario **diseñado** para N cosas se usa muchas veces con una sola. Si escribes como
+regla lo que era solo la forma del papel, la spec va a hacer leer mal todos los
+documentos siguientes.
+
+**Márcalo como duda y pregunta.** *"El formulario tiene cuatro columnas de destino:
+¿son cuatro tiendas distintas, o es siempre la misma con varias guías?"* Es una
+pregunta que el usuario contesta en diez segundos y que tú no puedes contestar solo.
+
 ---
 
 ## Paso 3 · Escribir la especificación
@@ -177,20 +193,40 @@ la entiende, está mal escrita.
 
 ## Paso 4 · Golden sample
 
-Antes de dar por descubierto el formato, **valídalo contra guías ya digitadas a
-mano** de ese mandante: toma documentos cuyos datos alguien ya cargó al sistema y
-compara **campo por campo** —folio, código de cliente, destino, ítems— lo que tú lees
-contra lo que está digitado.
+Antes de dar por descubierto el formato, **contrasta tu lectura contra un dato que una
+persona sacó de ese mismo papel**. Sin esto, el descubrimiento es una opinión del
+modelo sobre sí mismo.
 
-Sin esto, el descubrimiento es una opinión del modelo sobre sí mismo.
+### Cuál es el dato, porque casi nada está digitado a mano
 
-Si algo no calza, el que está mal es tu lectura, no el humano: corrige la spec y vuelve
-a mirar. Y si el desacuerdo es **sistemático** en un campo (siempre el mismo, siempre
-igual), eso no es error de lectura — es que la spec dice que el dato está donde no
-está.
+Cuidado con esto: **el destino, el código de cliente y la patente no los digita
+nadie** — los pone el sistema al crear el viaje. Compararlos contra el papel no es un
+golden sample: **es el cruce de validación**, justamente lo que esta skill todavía no
+puede medir. Si haces eso creyendo que validaste la lectura, no validaste nada.
 
-Si no hay guías digitadas con qué comparar, **dilo**: el golden sample quedó sin hacer
-y la spec vale menos. No lo omitas en silencio.
+Lo que **sí** escribió una persona leyendo el documento son dos cosas, y hay que ir a
+buscarlas:
+
+1. **El campo de referencia del formulario de recepción** — el que la empresa configuró
+   para que el conductor teclee el número que ve en el papel (en una operación real se
+   llama *"Doc. de Referencia"*). Ése es el golden sample de verdad: un humano leyó ese
+   número **del mismo documento** y lo escribió.
+2. **El folio de guía o factura que el viaje trae del ERP del mandante**, cuando está
+   poblado. En un mandante real venía en 2.146 de 2.185 entregas.
+
+Busca esos dos **antes de darte por vencido**. El paso parece imposible si lo lees como
+"comparar todo contra lo digitado", y es perfectamente posible si sabes que lo que se
+contrasta es, casi siempre, **un campo**.
+
+### Qué hacer con el resultado
+
+Si no calza, el que está mal es tu lectura, no el humano: corrige la spec y vuelve a
+mirar. Y si el desacuerdo es **sistemático** (siempre el mismo campo, siempre igual),
+eso no es error de lectura — es que la spec dice que el dato está donde no está.
+
+Si el mandante **no tiene ninguno de los dos**, entonces sí: el golden sample no se
+puede hacer. **Dilo** — quedó sin hacer y la spec vale menos. No lo omitas en
+silencio.
 
 ---
 
@@ -291,6 +327,11 @@ la respuesta no es "no se puede", es "falta esta pieza y así se vería cuando e
 - **El encabezado de evidencia es una barrera, no un comentario.** Va siempre.
 - **Las banderas quedan apagadas y se dice.** Prenderlas exige tasas medidas, no una
   observación sobre tres papeles.
+- **El golden sample se contrasta contra lo que digitó una persona** —el campo de
+  referencia del formulario, el folio del ERP—, no contra lo que puso el sistema. Eso
+  último es el cruce de validación, no una verificación de tu lectura.
+- **Una estructura repetida en el papel no significa que la operación la use.** Es
+  duda, no regla.
 - **El golden sample no es opcional**, y si no se pudo hacer, se dice.
 - **Lo que quedó en duda se escribe** en la spec, con quién lo resuelve. Las reglas
   persisten solas; las dudas se evaporan si no las escribes.

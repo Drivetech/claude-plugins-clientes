@@ -52,8 +52,9 @@ trabajo a un transportista. Eso se decide con números, y por ahora no los hay.
 - Las pistas de arriba.
 - Lo que el documento no aclara por sí solo (te lo va a mostrar como preguntas
   concretas, no como dudas vagas).
-- Con qué guías ya digitadas puede contrastar lo que leyó, para confirmar que no se
-  equivocó.
+- Con qué contrastar lo que leyó: normalmente el campo donde el conductor teclea el
+  número del papel al entregar (el "documento de referencia" de tu formulario de
+  recepción), o el folio que el viaje ya trae del sistema del mandante.
 
 ## Qué te entrega
 

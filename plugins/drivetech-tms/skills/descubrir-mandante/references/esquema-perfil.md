@@ -39,6 +39,23 @@ backend y sube sola en cada `upsert`). Hoy el contrato es **v1**.
   actualiza `actualizado` y deja `esquema` como está — salvo que hayas reescrito el
   perfil entero contra el contrato nuevo.
 
+## Cómo se guarda — la semántica de escritura no es la misma en todas
+
+Confundirlas borra datos sin que nada falle:
+
+- **`upsert_backlog_mandante` reemplaza el documento completo.** Lo que no mandes se
+  pierde. Para tocar un campo: leer con `get_backlog_settings(slug)`, cambiar solo
+  eso y reenviar todo lo demás byte-idéntico. Direcciona **por slug**, así que un
+  slug que colisiona escribe encima de otro mandante sin avisar — el slug se toma de
+  la lista del backend, nunca se calcula.
+- **`set_backlog_config` hace merge**, con una excepción: **`extra` se reemplaza
+  completo**. Para tocar una llave de `extra`, leer, mezclar y reenviar el resto.
+- **Otros endpoints del backend actualizan por campo:** lo que no viene, no se toca.
+  Así se guarda la especificación del documento del mandante (`document_spec`).
+
+Antes de escribir, ten claro en cuál de las tres estás. Ante la duda, **lee primero
+y reenvía completo**: es correcto en las tres.
+
 ## Secciones
 
 **0 · Identidad del mandante.** Cómo se llama en el TMS y **con qué otros nombres

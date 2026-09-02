@@ -58,12 +58,36 @@ cliente, fíjala con `select_enterprise`. Si ve una sola, no hay nada que hacer.
 **Antes de mirar la primera muestra, averigua si ese mandante ya existe.** Llama a
 `get_backlog_settings` (sin `slug`) y búscalo en la lista.
 
+### El slug lo da el backend — no lo calcules tú
+
+`get_backlog_settings` devuelve los **slugs reales**. Compara el nombre que te dio el
+usuario contra **esa lista**, no contra un slug que normalizaste por tu cuenta.
+
+Si lo calculas tú, agregas una tercera implementación de esa normalización —hay una
+en el backend y otra en el front— y basta que difieran en un detalle (dónde recortan
+el largo, qué hacen con un acento o un `&`) para que creas que el mandante es nuevo
+y el `upsert` lo escriba **encima de otro**. No es teórico: el equipo de front ya
+encontró una divergencia de recorte contra la del backend.
+
+Busca por **nombre** y de forma amplia: el usuario puede decir "Coca-Cola Andina"
+donde el backend tiene "Embotelladora Andina". Si aparece un candidato parecido,
+**pregúntale al usuario si es el mismo** en vez de decidirlo tú.
+
+### Los tres casos
+
 - **No está** → mandante nuevo. Sigue en el Paso 1 y descubre todo.
 - **Ya está** → es un **re-descubrimiento** (cambió el formato, o el perfil quedó
-  mal). Trae el perfil completo con `get_backlog_settings(slug=…)` y **guarda el
-  `spec_md` vigente antes de tocar nada.** Ese texto no es un borrador tuyo: tiene
-  meses de reglas que el usuario fue dando operando (Paso 9 de la skill de carga) y
-  que **no se descubren mirando una muestra**.
+  mal). Trae el perfil completo con `get_backlog_settings(slug=…)` **usando el slug
+  tal cual vino en la lista**, y **guarda el `spec_md` vigente antes de tocar nada.**
+  Ese texto no es un borrador tuyo: tiene meses de reglas que el usuario fue dando
+  operando (Paso 9 de la skill de carga) y que **no se descubren mirando una
+  muestra**.
+- **Hay uno parecido, pero el usuario confirma que es otro mandante** → cuidado: dos
+  nombres distintos pueden normalizar al **mismo slug**, y el segundo aterrizaría
+  encima del primero — el mandante viejo se quedaría con el nombre del nuevo y sin su
+  perfil. `upsert` no avisa de eso: escribe. Antes de guardar, pídele al usuario un
+  nombre que los distinga de verdad y verifica con `get_backlog_settings(slug=…)` que
+  el slug que va a quedar **no está tomado**. Si lo está, no guardes: avísale.
 
 En un re-descubrimiento lo que cambia es **cómo se lee** el mandante (secciones 1–3
 del perfil, a veces 4–6). Todo lo demás —criterio de asignación, comunicación,
@@ -306,9 +330,13 @@ Con todo lo anterior, **propón el perfil completo al usuario y hazlo confirmar
 antes de guardar nada.** Después **guárdalo en el backend de Drivetech** con
 `upsert_backlog_mandante` (opera sobre la empresa de la sesión):
 
-- `slug` (se normaliza solo, puedes pasar el nombre), `nombre`, `intake`
-  (`correo`/`archivo`) y su `intake_config` (correo: `remitentes`,
-  `asunto_contiene`; archivo: `ubicacion`, `patron`, `marcar_procesado`).
+- `slug` — **en un re-descubrimiento, el que te devolvió el backend, tal cual**
+  (no el nombre, no uno recalculado). En un mandante nuevo puedes pasar el nombre y
+  el backend normaliza, pero recién después de haber verificado en el Paso 0 que ese
+  slug no está tomado: `upsert` direcciona por slug y escribe encima sin avisar.
+- `nombre`, `intake` (`correo`/`archivo`) y su `intake_config` (correo:
+  `remitentes`, `asunto_contiene`; archivo: `ubicacion`, `patron`,
+  `marcar_procesado`).
 - `responder_a` / `copiar_a` (si se le responde).
 - **`spec_md`** — la especificación de lectura completa en Markdown, siguiendo la
   anatomía de `references/esquema-perfil.md` (el **contrato** del `spec_md`, que
@@ -407,6 +435,9 @@ dando instrucciones (ver su Paso 9).
 - **Escribe reglas, no listas que cambian.** Patentes, conductores y dotación
   salen del catálogo en el momento, no del perfil.
 - **Confirma el perfil antes de escribirlo**, y valida con una carga de prueba.
+- **El slug lo da el backend, no lo calcules.** Compara contra la lista de
+  `get_backlog_settings` y, en un re-descubrimiento, reenvía el slug tal cual vino.
+  Un slug adivinado que colisiona escribe encima de otro mandante, en silencio.
 - **Un mandante que ya existe se edita, no se reescribe.** `upsert` reemplaza el
   perfil completo: parte del `spec_md` vigente y preserva asignación, comunicación
   y lo aprendido en operación.

@@ -400,8 +400,7 @@ instalación no tiene backend, cae al modo archivo: `mandantes/<nombre>.md` +
 Es lo que sigue, pero **no ahora**: un mandante recién configurado todavía no tiene
 guías suyas en el sistema — el papel firmado aparece cuando empieza a operar. Cuando
 ya tenga algunas, el formato de su guía se descubre **aparte**, con la skill
-**`descubrir-guia-despacho`** si esta instalación la tiene, que produce el
-`document_spec` del mandante: dónde va el folio, el código de cliente, la tabla de
+**`descubrir-guia-despacho`**, que produce el `document_spec` del mandante: dónde va el folio, el código de cliente, la tabla de
 ítems. Es otra especificación y se rehace en otro momento — **ésta** cuando el
 mandante cambia *cómo pide viajes*, **aquélla** cuando cambia *su formulario*.
 

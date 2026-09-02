@@ -7,13 +7,14 @@ de la plataforma es lento y propenso a errores.
 
 La idea central: **descubrir una vez, cargar todos los días.**
 
-## Las tres skills
+## Las cuatro skills
 
 | Skill | Cuándo se usa | Qué hace |
 |---|---|---|
 | **descubrir-mandante** | Una vez por mandante (o si cambia su formato) | Lee muestras reales del mandante, infiere el mapeo a viajes del backlog, lo valida contra la plataforma y una carga de prueba, entrevista las reglas de asignación, y guarda el **perfil** del mandante. |
 | **cargar-viajes-backlog** | Todos los días | Consigue la solicitud del mandante (correo o archivo, según su intake), carga los viajes al backlog y propone la asignación de vehículo/conductor. |
 | **seguimiento-operacion** | Durante el día | Panorama de los viajes (estado, permanencias, tiempo en ruta), detecta anomalías y audita contra geocercas para separar un problema real de uno de geocerca; arma el estado interno o para el mandante. |
+| **descubrir-guia-despacho** | Cuando el mandante ya tiene guías subidas (o cambia su formulario) | Descubre cómo se lee la guía de despacho de ese mandante, la mide contra el histórico para saber qué tan confiable es cada dato impreso, y con esos números propone qué puede exigir la validación documental automática. |
 
 ## El modelo: un perfil por mandante
 
@@ -41,6 +42,15 @@ Los perfiles y la config **son datos del cliente** y viven en el **backend de
 Drivetech, por empresa** (vía MCP): sobreviven a las actualizaciones del plugin,
 al entorno efímero y al cambio de equipo. (Con fallback a archivos locales si una
 instalación no tiene backend.)
+
+### Dos descubrimientos distintos
+
+`descubrir-mandante` configura cómo el mandante **pide viajes**;
+`descubrir-guia-despacho`, cómo se lee el **papel que firma quien recibe**. Son
+artefactos distintos (`spec_md` y `document_spec`) y se rehacen en momentos
+distintos: uno cuando el mandante cambia su formato de solicitud, el otro cuando
+cambia su formulario. Por eso la guía **no se descubre al crear el mandante**: recién
+configurado todavía no tiene ninguna.
 
 ## Requisitos
 

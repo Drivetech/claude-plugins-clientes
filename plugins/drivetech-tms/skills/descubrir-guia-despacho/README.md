@@ -10,11 +10,9 @@ Este archivo es para **la persona**. El agente lee `SKILL.md`.
 
 ## Cuándo usarla
 
-- Un mandante empezó a operar y sus conductores ya subieron guías: es el momento de
-  descubrir su formulario y medirlo.
+- Un mandante nuevo empieza a operar y hay que enseñarle al sistema a leer su guía.
 - Se están **rechazando guías que estaban buenas** y hay que entender por qué.
 - El mandante **cambió su formulario**.
-- Ya corriste esto antes sin histórico, y ahora sí hay documentos para medir.
 
 **No es lo mismo que `descubrir-mandante`.** Esa configura cómo el mandante te **pide
 viajes**; ésta, cómo se lee el **papel que firma el que recibe**. Se rehacen en
@@ -23,30 +21,28 @@ momentos distintos y no hace falta correr las dos juntas.
 ## Por qué no se hace al crear el mandante
 
 Porque un mandante recién creado **todavía no tiene guías**. El papel firmado aparece
-cuando empieza a operar. Corre esta skill después, cuando ya haya documentos subidos —
-ahí es cuando sirve de verdad.
+cuando empieza a operar. Corre esta skill cuando ya tengas guías suyas en la mano.
 
-## Los dos caminos, y por qué no valen lo mismo
+## Qué hace, y qué todavía no
 
-**Con histórico** (lo que conviene). El agente toma las guías que tus conductores ya
-subieron, las cruza contra los viajes que las acompañan y te dice, con números, en
-cuántas apareció cada dato y en cuántas coincidió. Con eso te propone **qué se le
-puede exigir a ese mandante**.
+**Hace: describir el formulario.** Le pasas 2 o 3 guías reales, y el agente escribe
+dónde está cada dato, con qué rótulo aparece y qué cosas ese formulario no trae. Con
+eso el sistema puede **leer** el documento, que es lo que evita la mayoría de los
+rechazos injustos.
 
-**Sin histórico** (cuando todavía no hay nada). Le pasas 2 o 3 guías reales y el
-agente describe el formulario igual. Sirve para leerlo — **pero no para exigir nada**:
-con dos papeles se ve que un dato aparece, no con qué frecuencia. En ese caso las
-validaciones quedan **apagadas a propósito**, y el agente te lo dice al terminar, para
-que vuelvas a correr esto cuando haya guías.
+**Todavía no hace: medirlo.** Saber si un dato se puede *exigir* —o sea, autorizar al
+sistema a rechazar una guía porque no coincide— necesita cruzar cientos de guías ya
+subidas contra sus viajes y sacar la tasa de cada dato. Esa pieza está diseñada pero
+no construida, así que el agente **deja las validaciones apagadas y te lo dice**.
 
-Esa diferencia es deliberada: autorizar un rechazo automático es autorizar que se le
-devuelva trabajo a un transportista. Eso se decide con números.
+No es un descuido: autorizar un rechazo automático es autorizar que se le devuelva
+trabajo a un transportista. Eso se decide con números, y por ahora no los hay.
 
 ## Qué necesitas tener a mano
 
 - El **MCP de Drivetech** conectado, con la empresa correcta.
-- Si el mandante todavía no tiene guías subidas: **2 o 3 guías reales suyas**, ya
-  emitidas. Si su formato cambió alguna vez, una de cada versión.
+- **2 o 3 guías reales** de ese mandante, ya emitidas. Si su formato cambió alguna
+  vez, una de cada versión.
 - Cualquier **pista tuya sobre el formulario**: dónde miran ustedes el folio, qué
   campo se confunde seguido, qué rótulo usa el mandante para el código. Tus pistas
   tienen prioridad sobre lo que lea el sistema — tú conoces la operación.
@@ -56,26 +52,21 @@ devuelva trabajo a un transportista. Eso se decide con números.
 - Las pistas de arriba.
 - Lo que el documento no aclara por sí solo (te lo va a mostrar como preguntas
   concretas, no como dudas vagas).
-- Qué validaciones prender, **con el número de cada una a la vista**. La decisión es
-  tuya; el agente trae la evidencia.
+- Con qué guías ya digitadas puede contrastar lo que leyó, para confirmar que no se
+  equivocó.
 
 ## Qué te entrega
 
 - La **especificación del formulario** escrita en lenguaje de operación, para que la
   puedas corregir tú el día que el mandante cambie el papel. Si no la entiendes al
   leerla, está mal escrita: dilo.
-- Si hubo histórico: **las tasas de cada dato**, la brecha entre entregas y documentos
-  subidos, y la propuesta de qué exigir.
-
-## Un número que conviene mirar
-
-El agente siempre te va a decir **cuántas de tus entregas tienen documento subido**.
-No es un detalle: todas las tasas están calculadas sobre esas, así que si la mitad de
-las entregas no tiene guía subida, los porcentajes describen la mitad buena. Si ese
-número empeora con el tiempo, algo se rompió antes del papel.
+- Qué quedó **en duda**, como preguntas concretas que puedas contestar tú o
+  preguntarle al mandante.
+- Qué datos de ese formulario **valdría la pena medir** el día que se pueda, y cuáles
+  claramente no sirven para este mandante.
 
 ## Después
 
-Vuelve a correrla cuando el mandante cambie su formulario. La segunda corrida compara
-contra la anterior, y una caída fuerte en algún dato suele ser justamente eso: el
-formulario cambió y nadie avisó.
+Vuelve a correrla cuando el mandante **cambie su formulario**. Y cuando exista la
+medición, otra vez: ahí es cuando se puede decidir qué exigirle a ese mandante, con
+los números adelante.

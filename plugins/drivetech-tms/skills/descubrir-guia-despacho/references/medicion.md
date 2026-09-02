@@ -1,9 +1,28 @@
-# Medir la confiabilidad de cada identificador (camino A)
+# Medir la confiabilidad de cada identificador
 
 Esto es lo que separa una especificación de una **especificación con permiso para
 rechazar**. La pregunta que contesta es una sola: *"¿confío tanto en que este dato va
 impreso como para rechazarle una guía a un transportista?"*. Sin números, esa pregunta
 se contesta con intuición.
+
+## ⚠️ Hoy esto no se corre desde la skill
+
+Falta la capacidad del lado de la plataforma: no hay tool que traiga las guías **con
+su adjunto** y los datos del viaje que las acompaña (`get_trip_status` y
+`get_tms_dispatches_by_status` devuelven el viaje pero no `custom_form_values`, que es
+donde está la ruta del documento), y correr la extracción sobre cientos de documentos
+y cruzarlos es **trabajo por lotes**, no algo que un agente haga en una conversación.
+
+Lo que corresponde es una tool que **corra la medición del lado del servidor y
+devuelva las tasas**. Este archivo es, mientras tanto, dos cosas:
+
+- **La especificación de lo que esa capacidad tiene que hacer y devolver.**
+- **El criterio con que se leen las tasas cuando existan** — que no cambia según quién
+  las calcule.
+
+Se corrió a mano, con un script contra la base y el endpoint, y de ahí salen los
+números de más abajo. Eso no es reproducible desde una skill, y por eso la skill dice
+que no puede medir en vez de aparentar que sí.
 
 ---
 
@@ -32,7 +51,7 @@ cuesta cero; volver a llamar se cobra de nuevo, porque cada llamada analiza otra
 
 **5 · Cruzar, normalizando.** Ver abajo.
 
-**6 · Contar por identificador** y reportar (Paso 4 y 5 del `SKILL.md`).
+**6 · Contar por identificador** y reportar.
 
 ---
 

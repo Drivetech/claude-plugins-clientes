@@ -14,7 +14,7 @@ La idea central: **descubrir una vez, cargar todos los días.**
 | **descubrir-mandante** | Una vez por mandante (o si cambia su formato) | Lee muestras reales del mandante, infiere el mapeo a viajes del backlog, lo valida contra la plataforma y una carga de prueba, entrevista las reglas de asignación, y guarda el **perfil** del mandante. |
 | **cargar-viajes-backlog** | Todos los días | Consigue la solicitud del mandante (correo o archivo, según su intake), carga los viajes al backlog y propone la asignación de vehículo/conductor. |
 | **seguimiento-operacion** | Durante el día | Panorama de los viajes (estado, permanencias, tiempo en ruta), detecta anomalías y audita contra geocercas para separar un problema real de uno de geocerca; arma el estado interno o para el mandante. |
-| **descubrir-guia-despacho** | Cuando el mandante ya tiene guías subidas (o cambia su formulario) | Descubre cómo se lee la guía de despacho de ese mandante, la mide contra el histórico para saber qué tan confiable es cada dato impreso, y con esos números propone qué puede exigir la validación documental automática. |
+| **descubrir-guia-despacho** | Cuando hay guías reales del mandante (o cambia su formulario) | Descubre cómo se lee la guía de despacho de ese mandante y escribe la especificación de su formulario, que después usa la validación documental automática. Deja las validaciones de cruce apagadas mientras no haya tasas medidas sobre el histórico. |
 
 ## El modelo: un perfil por mandante
 

@@ -60,6 +60,41 @@ parte es la que evita rechazos injustos, y cada línea suele venir de un caso re
 **4 · Dudas abiertas.** Lo que no se pudo determinar, **como pregunta concreta** y con
 quién la resuelve. Si no hay ninguna, "Ninguna".
 
+## Las reglas de lectura — son espejo, no originales
+
+El `document_spec` lo pueden producir **dos superficies**: esta skill (con un agente
+que mira el documento, repregunta y corrige con el usuario) y la pantalla de creación
+de mandante de la plataforma, que corre una tarea de descubrimiento donde no hay nadie
+del otro lado. **Las dos tienen que producir el mismo artefacto.**
+
+Por eso estas reglas son un **espejo del contrato de esa tarea**
+(`docs/simple-task-guide-spec-discovery.md` en drivetech-ia-agents, apéndice A), no
+una versión propia. **Si cambian, cambian allá primero** y se replican acá. No las
+reescribas en el `SKILL.md`: si las dos derivan, la spec del front y la de la skill
+dejan de ser lo mismo y nadie se entera.
+
+1. **Trabaja solo sobre lo que ves en el documento.** No supongas que otros documentos
+   del mismo mandante traen campos que éste no trae, ni que los traen en el mismo
+   lugar si acá no se ve.
+2. **Las pistas del usuario tienen prioridad sobre tu lectura**: él conoce su
+   operación y tú ves un papel. Úsalas para orientarte y confírmalas contra el
+   documento. Si una pista **no coincide** con lo que ves, no elijas: dilo como duda,
+   con las dos lecturas.
+3. **Por cada identificador, di si aparece y dónde**, con el **rótulo exacto** que usa
+   el documento y un **ejemplo** del valor. Si no aparece, dilo: es información útil y
+   no una falla — significa que ese dato no sirve para cruzar en este formato.
+4. **Marca como duda todo lo que no puedas determinar** con lo que tienes a la vista.
+   Una duda escrita vale más que un supuesto: una persona la contesta en diez segundos
+   y un supuesto equivocado se descubre meses después. Formúlala como **pregunta
+   concreta**, no como advertencia vaga.
+5. **Nunca inventes** un rótulo, un ejemplo ni una ubicación. Si algo está cortado,
+   borroso o tapado, es duda.
+6. **Si hay tabla de ítems**, di dónde empieza, cómo se reconoce dónde termina y qué
+   columna es código, descripción, cantidad y precio. **Si no la hay, dilo
+   explícitamente**: muchos formularios listan guías o bultos y no productos.
+7. **La especificación es el texto principal** y el que se guarda. Completo y
+   ordenado, y que se pueda leer de corrido sin haber visto el papel.
+
 ## Cómo se escribe
 
 **Para que lo corrija un jefe de operaciones**, el día que el mandante cambie su

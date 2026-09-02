@@ -1,6 +1,6 @@
 {
   "name": "drivetech-tms",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Operación TMS de Drivetech: descubre el formato de viajes de cada mandante (onboarding), los carga al backlog y asigna, hace el seguimiento intradía de la operación (estado, anomalías y auditoría de geocercas), y descubre cómo se lee la guía de despacho de cada mandante para la validación documental. (Próximamente: análisis de la operación.)",
   "author": {
     "name": "Drivetech"

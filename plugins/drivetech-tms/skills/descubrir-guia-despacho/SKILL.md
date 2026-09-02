@@ -151,21 +151,19 @@ Lo que más se olvida:
 Con varias muestras, **contrasta**: lo que aparece igual en todas es del formulario;
 lo que cambia es del documento. No escribas como regla lo que viste una sola vez.
 
-### La trampa: una estructura repetida no significa que la operación la use
+### La trampa que más se cobra: la estructura repetida (regla 7)
 
 Un formulario con cuatro columnas de "Destinatario" **parece** admitir cuatro destinos.
 En la práctica puede que las cuatro sean **la misma tienda** — grupos de guías de una
-sola entrega. Y eso **no se puede saber mirando un documento**: se sabe preguntando, o
-viendo dos.
+sola entrega. Desde un documento eso **no se puede saber**.
 
-Vale para cualquier estructura que se repita —columnas, bloques, filas de destino—: un
-formulario **diseñado** para N cosas se usa muchas veces con una sola. Si escribes como
-regla lo que era solo la forma del papel, la spec va a hacer leer mal todos los
-documentos siguientes.
+La regla dice escribirlo como **duda**, nunca como regla del formulario. Tú tienes una
+ventaja que el descubridor del front no tiene: **puedes preguntar**. Úsala —
+*"¿son cuatro tiendas distintas, o siempre la misma con varias guías?"*— y escribe la
+respuesta. Si el usuario no la sabe, entonces sí queda como duda abierta.
 
-**Márcalo como duda y pregunta.** *"El formulario tiene cuatro columnas de destino:
-¿son cuatro tiendas distintas, o es siempre la misma con varias guías?"* Es una
-pregunta que el usuario contesta en diez segundos y que tú no puedes contestar solo.
+Lo que no puedes hacer es resolverla por tu cuenta: una repetición escrita como regla
+hace leer mal todos los documentos que vengan después.
 
 ---
 

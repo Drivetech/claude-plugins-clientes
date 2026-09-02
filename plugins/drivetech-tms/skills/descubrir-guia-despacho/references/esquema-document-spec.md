@@ -92,7 +92,14 @@ dejan de ser lo mismo y nadie se entera.
 6. **Si hay tabla de ítems**, di dónde empieza, cómo se reconoce dónde termina y qué
    columna es código, descripción, cantidad y precio. **Si no la hay, dilo
    explícitamente**: muchos formularios listan guías o bultos y no productos.
-7. **La especificación es el texto principal** y el que se guarda. Completo y
+7. **Una estructura repetida en el formulario no significa que la operación la
+   use.** Un papel con cuatro columnas de destinatario puede usarse siempre con una
+   sola tienda, agrupando guías; uno con dos tablas puede llenar solo la primera.
+   Desde un único documento eso **no se puede saber**. No lo escribas como regla del
+   formulario: escríbelo como **duda**, con la pregunta concreta — *"¿son cuatro
+   destinos distintos, o siempre el mismo con varias guías?"*. Una repetición escrita
+   como regla hace leer mal todos los documentos que vengan después.
+8. **La especificación es el texto principal** y el que se guarda. Completo y
    ordenado, y que se pueda leer de corrido sin haber visto el papel.
 
 ## Cómo se escribe

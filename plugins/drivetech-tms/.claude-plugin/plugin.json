@@ -1,7 +1,7 @@
 {
   "name": "drivetech-tms",
-  "version": "0.1.7",
-  "description": "Operación TMS de Drivetech: descubre el formato de viajes de cada mandante (onboarding), los carga al backlog y asigna, hace el seguimiento intradía de la operación (estado, anomalías y auditoría de geocercas), y descubre cómo se lee la guía de despacho de cada mandante para la validación documental. (Próximamente: análisis de la operación.)",
+  "version": "0.2.0",
+  "description": "Operación TMS de Drivetech: descubre el formato de viajes de cada mandante (onboarding), los carga al backlog y asigna, hace el seguimiento intradía de la operación (estado, anomalías y auditoría de geocercas), descubre cómo se lee la guía de despacho de cada mandante para la validación documental, y analiza la operación sobre un período para proponer qué cambiar.",
   "author": {
     "name": "Drivetech"
   },
@@ -13,6 +13,9 @@
     "logistica",
     "transporte",
     "guia-de-despacho",
-    "validacion-documental"
+    "validacion-documental",
+    "analisis",
+    "geocercas",
+    "gestion"
   ]
 }

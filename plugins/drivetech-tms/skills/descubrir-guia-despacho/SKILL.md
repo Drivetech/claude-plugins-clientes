@@ -173,6 +173,21 @@ respuesta. Si el usuario no la sabe, entonces sí queda como duda abierta.
 Lo que no puedes hacer es resolverla por tu cuenta: una repetición escrita como regla
 hace leer mal todos los documentos que vengan después.
 
+### Preguntar puede cambiar la regla, no solo confirmarla
+
+No des por buena la regla que viste en las muestras solo porque el usuario no te
+contradijo. Preguntá aunque tu lectura parezca clara — y sobre todo **cuando parezca
+clara**.
+
+Caso real: tres de tres documentos traían **una sola tienda**, y la regla escrita
+habría sido *"siempre una tienda por documento"*. El usuario contestó otra cosa: *"no
+sé, pero al menos una debe coincidir"* — más floja y **más correcta**. La regla medida
+habría rechazado guías multi-tienda válidas.
+
+Lo que ves en pocas muestras te da **la regla más estrecha que las explica**, no la
+regla real. La distancia entre esas dos es exactamente lo que se rechaza mal después.
+Y esa distancia no se cierra mirando más papeles: se cierra preguntando.
+
 ---
 
 ## Paso 3 · Escribir la especificación

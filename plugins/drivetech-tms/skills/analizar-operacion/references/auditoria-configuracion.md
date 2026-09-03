@@ -3,8 +3,14 @@
 Es el capítulo que más se puede accionar: son cambios que se hacen en la plataforma, sin
 comprar nada ni cambiar la operación.
 
-`get_operation_diagnostics(section="configuracion")` trae las banderas de la cuenta
-**y su uso real**. Esa segunda mitad es la que hace interpretable a la primera.
+`get_operation_diagnostics(section="configuracion")` trae la `cuenta` (banderas), las
+`restricciones` con cuántas veces bloquearon, `validacion_ia`, `catalogo_clientes` y
+`catalogo_origenes` (**en catálogo** contra **con viajes**), los tipos definidos contra
+los usados, y el `formulario_de_recepcion` campo por campo —resuelto a su nombre— con
+cuántas veces vino vacío.
+
+O sea: las banderas **y su uso real**. Esa segunda mitad es la que hace interpretable a
+la primera.
 
 > **Una bandera configurada no dice nada. Una bandera con su uso al lado dice algo.**
 
@@ -43,8 +49,8 @@ característica que **ninguna parte de la flota tiene**, esos viajes no se puede
 asignar y alguien los está resolviendo a mano todos los días. Es de los hallazgos más
 baratos de arreglar.
 
-**Catálogo con clientes muertos.** En una cuenta real medida: **72 clientes cargados y
-33 con viajes** en 60 días. Los 39 restantes ensucian el autocompletado y son
+**Catálogo con clientes muertos.** Compara `en_catalogo` contra `con_viajes`. En una
+cuenta real medida: **72 clientes cargados y 33 con viajes** en 60 días. Los 39 restantes ensucian el autocompletado y son
 candidatos a que una carga resuelva un nombre contra **el destino equivocado** — que no
 es un problema estético, es un viaje mal dirigido. *Qué rompe:* desactivar un cliente
 que vuelve en temporada obliga a recrearlo; propón revisar, no borrar en bloque.
@@ -53,6 +59,14 @@ que vuelve en temporada obliga a recrearlo; propón revisar, no borrar en bloque
 mayoría de las entregas significa que la operación encontró cómo saltárselo, o que pide
 algo que en terreno no existe. Las dos cosas se arreglan, y ninguna se arregla
 insistiendo.
+
+**El campo del documento adjunto es un caso aparte, y hay que buscarlo.** En una cuenta
+real medida, **el campo de la guía firmada vino vacío en 598 de 1.289 formularios**:
+casi la mitad de los cierres no adjunta el documento. Eso no es un campo incómodo — es
+que **en la mitad de los viajes no hay nada que validar**, así que toda la validación
+documental corre sobre la otra mitad. Repórtalo con esa lectura, no como un porcentaje
+de completitud, y conéctalo: cualquier tasa de aprobación documental de esa cuenta está
+calculada sobre los viajes que sí adjuntaron, que son los que salieron bien.
 
 **Formularios sin campo de referencia.** Si el formulario de recepción solo tiene el
 adjunto y **ningún campo donde el conductor teclee el número del papel**, la validación

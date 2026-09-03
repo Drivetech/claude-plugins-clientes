@@ -59,7 +59,17 @@ para hacerla: caro, y con el error escondido en un paso que nadie revisa. Si en 
 punto te ves escribiendo *"sumo las permanencias y divido"*, **no lo hagas**: falta una
 sección en la tool y eso se reporta, no se improvisa.
 
-Dos consecuencias que valen como regla:
+### `como_leerlo` se lee antes de interpretar
+
+Cada respuesta trae, además de `datos`, un campo **`como_leerlo`**: una advertencia
+escrita para esa sección, puesta ahí precisamente para que **no saques la conclusión
+fácil**. No es relleno ni un disclaimer legal — es la parte del contrato que sabe algo
+sobre esos números que tú no puedes ver mirándolos.
+
+**Léelo antes de escribir una sola línea del capítulo**, y si contradice tu lectura,
+gana él. Si lo que dice cambia lo que ibas a afirmar, eso ya es material del informe.
+
+Dos consecuencias más que valen como regla:
 
 - **Los nombres los pone la tool.** Conductores, geocercas, clientes, orígenes: tal
   cual vienen. No los normalices ni los unifiques. Si un conductor aparece con dos
@@ -76,9 +86,10 @@ Dos consecuencias que valen como regla:
   empresa no tiene contratado el módulo de tms"*, que parece un problema de permisos y
   no lo es.
 - **`get_operation_diagnostics`** — la tool que trae el diagnóstico. Una sección por
-  capítulo (`instrumento`, `operacion`, `conductores`, `configuracion`), con
-  `start_date` y `end_date`, y opcionalmente `group_name` (para acotar a la faena de un
-  mandante) u `origin`.
+  capítulo (`section`: `instrumento`, `operacion`, `conductores`, `configuracion`), con
+  `start_date` y `end_date` opcionales (sin fechas: últimos 60 días), `group_name` para
+  acotar a la faena de un mandante, `origin`, y `min_trips` (por defecto 5) para el
+  corte de la ficha por conductor.
 - **El período**. Si el usuario no lo dice, propón 60 días y confirma: menos que eso
   deja los denominadores demasiado chicos para hablar de un conductor o una geocerca.
 - **La calibración de esta empresa** (Paso 1). Sin ella no puedes escribir el capítulo
@@ -135,8 +146,10 @@ Los hitos de origen y destino los produce el **paso por una geocerca**. Si el po
 es chico, está mal centrado, o el camión estaciona afuera del patio, el hito no se
 registra — y ese viaje desaparece de todos los promedios.
 
-Pide `get_operation_diagnostics(section="instrumento")`. Lo que trae va **al principio
-del informe**, no en un anexo:
+Pide `get_operation_diagnostics(section="instrumento")`. Trae el `total` de la
+operación —los cinco conteos de hitos y los **orígenes invertidos**— más `origenes` y
+`destinos`, cada uno con viajes, `con_llegada`, `con_salida` y `entra_y_no_sale`. Lo que
+sale de ahí va **al principio del informe**, no en un anexo:
 
 - **Cobertura de hitos**: de los viajes del período, qué porcentaje tiene los cuatro
   hitos completos. En operaciones reales medidas, esa cifra va de **76 % a 85 %** —
@@ -149,6 +162,12 @@ del informe**, no en un anexo:
 - **Orígenes y destinos sin geocerca.** Ésos no producen hitos **nunca**, así que no
   son un porcentaje bajo: son un agujero completo, y todo viaje que pase por ahí queda
   fuera de la medición. Van listados aparte de los que miden mal.
+- **Orígenes fuera de catálogo** (`fuera_de_catalogo`). Un origen que aparece en los
+  viajes pero no está en el catálogo no tiene geocerca ni la va a tener, y además
+  delata que se está escribiendo a mano algo que debería elegirse de una lista.
+- **Origen invertido** (`origen_invertido`). Viajes donde origen y destino parecen
+  estar al revés. No lo presentes como un error de la geocerca: es un dato mal
+  cargado, y lo que hay que revisar es de dónde salió esa carga.
 
 Y la consecuencia, escrita explícita en el informe:
 
@@ -166,9 +185,16 @@ muestra que sobrevive está sesgada hacia el caso fácil.
 
 ## Paso 3 · Capítulo 2 · La operación
 
-Pide `get_operation_diagnostics(section="operacion")`: trae **permanencia en origen**,
-**tiempo de ruta**, **permanencia en destino**, **vueltas por vehículo por día** y
-**span de jornada**, todo como **percentiles** y cada uno con su denominador.
+Pide `get_operation_diagnostics(section="operacion")`. Trae el `resumen` del período
+(viajes, entregados, vehículos, conductores, días), los `tiempos_min` de **origen,
+destino, ruta y desvío de carga** como **p25 / mediana / p75 / p90 — cada uno con su
+`_n` propio**, el bloque `hora_de_carga`, las `vueltas_por_vehiculo_dia` y la
+`jornada_min`.
+
+**Cada magnitud trae su propio `n`, y no son el mismo número.** El `n` de la permanencia
+en origen no es el de la ruta: un viaje puede tener el hito de salida y no el de
+llegada. Usa el `n` de cada magnitud junto a esa magnitud, nunca el total de viajes
+para todas.
 
 **Ningún número sale sin su denominador.** Se escribe *"1:47 sobre 1.187 de 1.366
 viajes"*, nunca *"1:47"*. Un promedio sin denominador es una afirmación sobre un
@@ -212,8 +238,22 @@ la definición.** Ésta es la lección más importante del capítulo:
 > definición que de operación.** Antes de decir que alguien llega tarde, verifica que
 > la hora contra la que estás midiendo **signifique algo**.
 
-Cuando la definición sea dudosa, dilo así: *"esto se desvía si la hora comprometida es
-una promesa; si es el cupo que asignó el sistema, no mide nada"*. Y pregunta.
+**Y ese caso no lo vas a poder resolver mirando los datos.** La plataforma **no
+registra** si la hora comprometida la puso el mandante o la asignó el sistema al tomar
+un cupo: `hora_de_carga.con_hora_comprometida` dice cuántos viajes **tienen** hora, no
+**de dónde salió**. No intentes deducirlo, no lo infieras del patrón y no lo supongas
+por el tipo de cuenta.
+
+Es una **pregunta al usuario**, siempre:
+
+> *"El 53 % sale más de una hora después de la hora comprometida. Antes de leer eso
+> como atraso: esa hora, ¿la comprometen ustedes con el mandante, o la asigna el
+> sistema tomando el cupo más cercano? La respuesta cambia el hallazgo entero."*
+
+Según qué conteste, el mismo número es *"la operación llega tarde de forma
+sistemática"* o *"la mitad de los viajes se mide contra una hora que nadie prometió"*.
+Uno manda a arreglar la operación y el otro a arreglar la definición. **No elijas por
+él.**
 
 ---
 
@@ -228,7 +268,11 @@ informe que solo propone mejoras es una lista de deseos; uno que dice qué se ro
 una decisión.
 
 Pide `get_operation_diagnostics(section="configuracion")`. Trae las banderas de la
-cuenta **y su uso real**, que es lo que las hace interpretables. Cómo leerlas está en
+`cuenta`, las `restricciones` con cuántas veces bloquearon, `validacion_ia`, los
+catálogos de clientes y orígenes (**en catálogo contra con viajes**), los tipos
+definidos contra los usados, y el `formulario_de_recepcion` campo por campo con cuántas
+veces vino vacío. O sea: las banderas **y su uso real**, que es lo que las hace
+interpretables. Cómo leerlas está en
 **`references/auditoria-configuracion.md`**; léelo antes de escribir el capítulo.
 
 La idea que lo gobierna: **una bandera configurada no dice nada; una bandera con su uso
@@ -254,7 +298,8 @@ y va a tomar decisiones con ella.
 ## La ficha por conductor
 
 Pide `get_operation_diagnostics(section="conductores")`. Va **con nombre**, y por eso
-con tres disciplinas que no son opcionales.
+con tres disciplinas que no son opcionales — las tres ya vienen respaldadas por la
+respuesta, así que no hay que reconstruirlas:
 
 **1 · Separa lo que depende del conductor de lo que no.** El tiempo de ruta entre
 geocercas es suyo. La permanencia en origen **esperando que lo carguen** no lo es. Un
@@ -263,12 +308,17 @@ más rápida de que lo rechacen los mismos a quienes nombra — y de que se pier
 lo que el informe tenía de cierto.
 
 **2 · Mínimo de viajes.** Un ranking sobre pocos casos es ruido con aspecto de
-hallazgo. Fija un mínimo, dilo, y deja fuera del ranking a quien no lo alcance — sin
-esconderlo: *"4 conductores quedaron fuera por tener menos de N viajes"*.
+hallazgo. La tool ya separa: los que llegan al corte van en `conductores` y el resto en
+`sin_muestra_suficiente`, con `min_viajes` diciendo dónde quedó la línea. **No los
+mezcles de vuelta** — y tampoco los escondas: nómbralos como lo que son, *"4 conductores
+quedaron fuera del ranking por tener menos de 5 viajes en el período"*. Si el usuario
+necesita otro corte, se pide con `min_trips`, no se recalcula.
 
 **3 · Compara contra trabajo comparable.** El tiempo de ruta va contra **la mediana de
-esa misma ruta**, no contra el promedio general de la flota. Si no, estás comparando
-rutas y poniéndole el nombre de una persona.
+esa misma ruta**, no contra el promedio general de la flota — para eso está
+`ruta_vs_mediana_mediana`, que ya viene calculado por ruta. **Usa ese campo, no compares
+tiempos de ruta crudos entre conductores**: eso compara rutas y le pone el nombre de una
+persona.
 
 Y el encuadre: esto es para **encontrar dónde ayudar**, no para armar un ranking de
 castigo. Si un conductor se desvía siempre en la misma ruta, la pregunta útil es qué
@@ -315,6 +365,7 @@ reenvía). Si es solo de este mandante, va a su delta.
 
 - **Primero el instrumento, después la medición.** Si no reportaste la cobertura de
   hitos, todavía no puedes interpretar un promedio.
+- **`como_leerlo` se lee antes de interpretar**, y si contradice tu lectura, gana él.
 - **La tool computa, tú interpretas.** Si te ves calculando un promedio, falta una
   sección: repórtalo, no lo improvises.
 - **Los nombres los pone la tool.** Dos grafías del mismo conductor son un hallazgo, no
@@ -325,7 +376,9 @@ reenvía). Si es solo de este mandante, va a su delta.
   calibración no hay capítulo 3.
 - **Mediana antes que promedio**, y si difieren mucho, eso es el hallazgo.
 - **Un desvío que afecta a la mitad de los casos es sospechoso de definición**, no de
-  operación. Verifica qué significa aquello contra lo que mides.
+  operación. Verifica qué significa aquello contra lo que mides — y si el dato no está
+  (la plataforma no registra de dónde salió la hora comprometida), **pregunta**, no
+  deduzcas.
 - **Cada propuesta dice qué rompe.** Sin esa parte es una lista de deseos.
 - **Las geocercas se proponen, no se aplican** — y agrandar una corta la comparación
   con el pasado.

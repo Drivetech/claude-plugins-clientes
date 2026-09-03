@@ -23,12 +23,13 @@ cierto. Es el recordatorio de que **el dato no trae su interpretación puesta**.
 | Vueltas por vehículo | ¿Cuántas se esperan en un día normal? ¿Hay primera y segunda vuelta con lógicas distintas? |
 | Ralentí | ¿Qué equipos idlean **por diseño** (refrigeración) y no deberían contarse igual? |
 | Span de jornada | ¿Cuál es el rango habitual? (Ojo: esto **no** es la jornada laboral — ver el `SKILL.md`.) |
-| Hora comprometida | ¿Es una promesa real, o la asigna el sistema por cupo? Esto cambia si un "atraso" significa algo. |
+| Hora comprometida | ¿Es una promesa real, o la asigna el sistema por cupo? **La plataforma no registra esto**, así que es pregunta obligada: sin la respuesta, cualquier "atraso" que reportes puede no significar nada. |
 
 ## Cómo se hace
 
 1. **Pide la distribución real** con `get_operation_diagnostics(section="operacion")`
-   del período. Ya viene en percentiles.
+   del período. Ya viene en percentiles (p25 / mediana / p75 / p90), cada magnitud con
+   su propio `n`. Lee el `como_leerlo` de la respuesta antes de mostrar nada.
 2. **Muéstrasela al usuario con su forma, no solo con su centro.** Mediana, cuartiles y
    la cola. Dos operaciones con la misma mediana y colas distintas son problemas
    distintos, y la mediana sola los esconde.

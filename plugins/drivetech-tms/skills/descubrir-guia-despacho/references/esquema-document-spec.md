@@ -101,6 +101,11 @@ dejan de ser lo mismo y nadie se entera.
    formulario: escríbelo como **duda**, con la pregunta concreta — *"¿son cuatro
    destinos distintos, o siempre el mismo con varias guías?"*. Una repetición escrita
    como regla hace leer mal todos los documentos que vengan después.
+   **Antes de escribirlo como duda, busca si el documento trae un contador**: un
+   formulario que repite una estructura suele decir en algún lado cuántas veces la usa
+   de verdad (*"Tiendas a visitar: 00001"*, *"Bultos: 3"*, *"Página 1 de 1"*). Si lo
+   encuentras, la duda **tiene respuesta en el papel** y no hay que preguntar nada:
+   escribe dónde está ese contador y qué significa.
 8. **La especificación es el texto principal** y el que se guarda. Completo y
    ordenado, y que se pueda leer de corrido sin haber visto el papel.
 

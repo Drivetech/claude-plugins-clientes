@@ -165,10 +165,15 @@ Un formulario con cuatro columnas de "Destinatario" **parece** admitir cuatro de
 En la práctica puede que las cuatro sean **la misma tienda** — grupos de guías de una
 sola entrega. Desde un documento eso **no se puede saber**.
 
-La regla dice escribirlo como **duda**, nunca como regla del formulario. Tú tienes una
-ventaja que el descubridor del front no tiene: **puedes preguntar**. Úsala —
-*"¿son cuatro tiendas distintas, o siempre la misma con varias guías?"*— y escribe la
-respuesta. Si el usuario no la sabe, entonces sí queda como duda abierta.
+La regla dice **buscar primero un contador impreso** —*"Tiendas a visitar: 00001"*,
+*"Bultos: 3"*— porque un formulario que repite una estructura suele decir en algún lado
+cuántas veces la usa de verdad. Si está, la duda tiene respuesta en el papel.
+
+Si no está, la regla dice escribirlo como **duda**, nunca como regla del formulario. Y
+ahí tienes una ventaja que el descubridor del front no tiene: **puedes preguntar**.
+Úsala — *"¿son cuatro tiendas distintas, o siempre la misma con varias guías?"*— y
+escribe la respuesta. Si el usuario tampoco la sabe, entonces sí queda como duda
+abierta.
 
 Lo que no puedes hacer es resolverla por tu cuenta: una repetición escrita como regla
 hace leer mal todos los documentos que vengan después.

@@ -111,34 +111,7 @@ Dos consecuencias más que valen como regla:
 
 ---
 
-## Paso 1 · Calibrar (solo la primera vez, y cuando el usuario lo pida)
-
-**La primera corrida calibra.** No inventes umbrales, no traigas un estándar de la
-industria, y no uses los de otra empresa. Lo normal lo define esta operación.
-
-Cómo se hace está en **`references/calibracion.md`**. En resumen: pide
-`get_operation_diagnostics(section="operacion")` del período, que ya trae cada magnitud
-**como percentiles** (permanencia en origen y destino, tiempo de ruta, vueltas por día,
-ralentí), **muéstrale la distribución al usuario** —mediana, cuartiles, la cola larga—
-y **pregúntale qué es normal acá**. Después guárdalo.
-
-Por qué esto no se puede saltar, con el caso que lo enseñó: un umbral de **2 horas** de
-permanencia en origen **pinta de rojo una operación entera** cuando los camiones
-pernoctan en la planta, porque la llegada es del día anterior y no hay nada anormal en
-eso. El número era correcto; el umbral describía otra operación.
-
-Al mostrarle la distribución, **muestra la forma, no solo el centro**. Dos operaciones
-con la misma mediana y colas distintas son problemas distintos, y la mediana sola las
-esconde.
-
-La calibración **se guarda** (ver `references/calibracion.md`): base en la config de la
-empresa, delta en el `spec_md` del mandante que opere distinto. Y **se revisa**: si el
-usuario dice que algo cambió, o si la distribución se movió mucho respecto de la
-calibración vigente, díselo y ofrécele recalibrar. No recalibres solo.
-
----
-
-## Paso 2 · Capítulo 1 · El instrumento
+## Paso 1 · Capítulo 1 · El instrumento
 
 **Antes de leer la medición, revisa el aparato.**
 
@@ -169,6 +142,40 @@ sale de ahí va **al principio del informe**, no en un anexo:
   estar al revés. No lo presentes como un error de la geocerca: es un dato mal
   cargado, y lo que hay que revisar es de dónde salió esa carga.
 
+### ¿Fue el mismo instrumento todo el período?
+
+El capítulo 1 no pregunta solo *"¿el instrumento es confiable?"*, sino **"¿fue el mismo
+instrumento de principio a fin?"**.
+
+Si el período pasa de unas pocas semanas, **pide la serie**: `bucket="semana"` (o
+`"mes"`) en `instrumento` y en `operacion`. Devuelve la evolución por período, más un
+`por_que_la_serie` que explica para qué mirarla.
+
+**Busca un escalón, no una tendencia.** Un caso real, cobertura de los cuatro hitos por
+semana:
+
+```
+62% · 70% · 65% · 65% · 59%   →   95% · 97% · 95% · 91%
+```
+
+Eso no es una operación que mejoró: es **un cambio de plataforma con fecha**. El
+promedio del período —78 %— es el promedio de un sistema roto y uno sano, **y no
+describe a ninguna de las dos mitades**.
+
+Cuando encuentres un escalón:
+
+1. **Dilo, con la fecha.** Y pregúntale al usuario qué pasó ahí: un despliegue, un
+   cambio de equipos, una geocerca redibujada. Él lo sabe y tú no.
+2. **Analiza el tramo posterior**, no el período completo. Promediar encima de un
+   quiebre produce un número que no le pasó a nadie.
+3. **No mandes a arreglar lo que ya se arregló.** Sin este corte, un informe honesto
+   manda al cliente a redibujar geocercas sanas por un problema que se resolvió hace un
+   mes.
+
+La regla general, que vale más allá de las geocercas: **un período que contiene un
+cambio de plataforma no es comparable consigo mismo**, y cualquier tendencia calculada
+encima mide el despliegue, no la operación.
+
 Y la consecuencia, escrita explícita en el informe:
 
 > **Los viajes que no se pudieron medir no son un dato faltante repartido al azar.**
@@ -180,6 +187,43 @@ Y la consecuencia, escrita explícita en el informe:
 
 Es la misma disciplina del denominador que ya usa el descubrimiento de guías: la
 muestra que sobrevive está sesgada hacia el caso fácil.
+
+---
+
+## Paso 2 · Calibrar (solo la primera vez, y cuando el usuario lo pida)
+
+**Después del capítulo 1, nunca antes.** Calibrar primero es fijar como "normal" un
+número que puede ser el sesgo: en una cuenta real, la permanencia mediana en destino
+daba **39 minutos** mientras la detección de salida estaba degradada, y **50** una vez
+arreglada — porque justamente faltaban las salidas de los que se quedaban más tiempo.
+Calibrar con los datos de esas semanas habría dejado 39 escrito como lo normal, y el
+capítulo 3 habría estado midiendo desviaciones contra una cifra rota.
+
+Y por lo mismo: **no calibres sobre un período que contenga un quiebre** (Paso 1). Si
+lo hay, calibra sobre el tramo posterior y dilo.
+
+**La primera corrida calibra.** No inventes umbrales, no traigas un estándar de la
+industria, y no uses los de otra empresa. Lo normal lo define esta operación.
+
+Cómo se hace está en **`references/calibracion.md`**. En resumen: pide
+`get_operation_diagnostics(section="operacion")` del período, que ya trae cada magnitud
+**como percentiles** (permanencia en origen y destino, tiempo de ruta, vueltas por día,
+ralentí), **muéstrale la distribución al usuario** —mediana, cuartiles, la cola larga—
+y **pregúntale qué es normal acá**. Después guárdalo.
+
+Por qué esto no se puede saltar, con el caso que lo enseñó: un umbral de **2 horas** de
+permanencia en origen **pinta de rojo una operación entera** cuando los camiones
+pernoctan en la planta, porque la llegada es del día anterior y no hay nada anormal en
+eso. El número era correcto; el umbral describía otra operación.
+
+Al mostrarle la distribución, **muestra la forma, no solo el centro**. Dos operaciones
+con la misma mediana y colas distintas son problemas distintos, y la mediana sola las
+esconde.
+
+La calibración **se guarda** (ver `references/calibracion.md`): base en la config de la
+empresa, delta en el `spec_md` del mandante que opere distinto. Y **se revisa**: si el
+usuario dice que algo cambió, o si la distribución se movió mucho respecto de la
+calibración vigente, díselo y ofrécele recalibrar. No recalibres solo.
 
 ---
 
@@ -261,11 +305,33 @@ Uno manda a arreglar la operación y el otro a arreglar la definición. **No eli
 
 Cada propuesta con **la misma forma, siempre**:
 
-> **Evidencia** → **consecuencia** → **qué se cambia** → **qué rompe**
+> **Evidencia** → **consecuencia** → **quién lo arregla** → **qué se cambia** → **qué rompe**
 
-Las cuatro partes son obligatorias, y la cuarta es la que casi nunca se escribe. Un
-informe que solo propone mejoras es una lista de deseos; uno que dice qué se rompe es
-una decisión.
+Las cinco partes son obligatorias. La última es la que casi nunca se escribe —un informe
+que solo propone mejoras es una lista de deseos; uno que dice qué se rompe es una
+decisión— y **la tercera es la que decide si el informe sirve o hace perder el tiempo**.
+
+### Los tres dueños
+
+| dueño | quién lo arregla | costo |
+|---|---|---|
+| **Plataforma** | DriveTech | El cliente **no puede**. Si se lo presentas como suyo, lo va a intentar y va a fracasar. |
+| **Configuración** | El cliente, en su cuenta | El más rápido, y el que más se pasa por alto. |
+| **Operación** | La gente que mueve camiones | El más caro y el más lento — y por eso **el peor lugar donde mandar un problema que no era suyo**. |
+
+**El mismo síntoma puede ser de cualquiera de los tres, y eso no es teórico.** Una
+cobertura de hitos del 78 % **parece** configuración —geocercas mal dibujadas— y en un
+caso real era **plataforma**, y encima ya estaba resuelta. Sin atribuir, ese informe
+manda a un cliente a redibujar polígonos sanos.
+
+Y un 53 % de atraso contra la hora de carga puede ser **operación** (llegan tarde) o
+**configuración** (la hora es un cupo que asignó el sistema). El mismo número, dos
+dueños opuestos y dos acciones incompatibles.
+
+**La atribución es una afirmación más, sujeta a la misma regla que el resto**: cuando no
+esté clara, escribe las lecturas posibles y **quién puede distinguirlas**. No elijas por
+conveniencia, y sobre todo no elijas "operación" por descarte — es el único de los tres
+que cuesta plata y cansancio ajeno.
 
 Pide `get_operation_diagnostics(section="configuracion")`. Trae las banderas de la
 `cuenta`, las `restricciones` con cuántas veces bloquearon, `validacion_ia`, los
@@ -294,6 +360,29 @@ Sin esa advertencia escrita, en tres meses alguien va a ver una mejora que no oc
 y va a tomar decisiones con ella.
 
 ---
+
+## Paso 6 · Los hallazgos de plataforma vuelven a DriveTech
+
+Los hallazgos cuyo dueño es **plataforma** van, además de en su lugar del capítulo 4, en
+una **sección aparte al final**, redactada para **copiarse y mandarse a DriveTech tal
+cual**: con la evidencia y el período, no con la conclusión sola. Quien la reciba no vio
+esta operación y no puede evaluar una conclusión suelta.
+
+Por qué vale la pena el paso extra: una sola corrida en una sola cuenta produjo tres
+hallazgos de este tipo, y uno de ellos —**la detección de salida degradada durante seis
+semanas**— había sido invisible todo ese tiempo **porque el síntoma era "faltan datos",
+y eso no se ve como una falla: se ve como que el dato no estaba**. Se arregló de
+casualidad.
+
+Con esta skill corriendo por cuenta, un problema así aparece en la primera corrida. Y si
+aparece en **varias cuentas a la vez**, deja de ser la anomalía de un cliente y pasa a
+ser un incidente de producto — que es una conclusión que ninguna cuenta puede sacar
+sola.
+
+Así que el informe es dos cosas al mismo tiempo: una herramienta para que el cliente
+mejore su operación, y **un detector de los problemas de la propia plataforma,
+distribuido en todas las cuentas que lo corran**. Escribe esa sección aunque esté vacía:
+"sin hallazgos de plataforma en este período" también es información.
 
 ## La ficha por conductor
 
@@ -373,13 +462,18 @@ reenvía). Si es solo de este mandante, va a su delta.
 - **Ningún número sin denominador.** Va pegado al número, no al pie. Y falta de dato no
   es cero.
 - **Lo normal lo define esta empresa**, no la industria ni otro cliente. Sin
-  calibración no hay capítulo 3.
+  calibración no hay capítulo 3 — y sin capítulo 1, la calibración fija el sesgo como
+  normal.
 - **Mediana antes que promedio**, y si difieren mucho, eso es el hallazgo.
 - **Un desvío que afecta a la mitad de los casos es sospechoso de definición**, no de
   operación. Verifica qué significa aquello contra lo que mides — y si el dato no está
   (la plataforma no registra de dónde salió la hora comprometida), **pregunta**, no
   deduzcas.
-- **Cada propuesta dice qué rompe.** Sin esa parte es una lista de deseos.
+- **Cada propuesta dice quién lo arregla y qué rompe.** Sin dueño, el informe manda al
+  cliente a arreglar lo que no puede, o a la operación lo que era configuración.
+- **No elijas "operación" por descarte.** Es el dueño más caro y el más lento.
+- **Un período con un quiebre no es comparable consigo mismo.** Busca el escalón antes
+  de promediar, y analiza después del corte.
 - **Las geocercas se proponen, no se aplican** — y agrandar una corta la comparación
   con el pasado.
 - **Al conductor solo lo que depende de él**, con mínimo de viajes y contra trabajo

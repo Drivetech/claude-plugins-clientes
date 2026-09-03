@@ -4,6 +4,20 @@ Sin calibración no hay capítulo 3. "Se desvía" es una afirmación relativa, y
 está del otro lado de la comparación tiene que ser **esta operación**, no un estándar
 de la industria ni el de otro cliente.
 
+## Se calibra DESPUÉS del capítulo 1
+
+Calibrar antes de revisar el instrumento fija como normal un número que puede ser el
+sesgo. Medido en una cuenta real: la permanencia mediana en destino daba **39 minutos**
+mientras la detección de salida estaba degradada, y **50** una vez arreglada — faltaban
+justamente las salidas de los que se quedaban más tiempo. **El sesgo no era ruido: tenía
+dirección.**
+
+Si hubiera calibrado en esas semanas, 39 quedaba escrito como lo normal y el capítulo 3
+habría medido desviaciones contra una cifra rota, indefinidamente.
+
+Y si el período contiene un quiebre (Paso 1), calibra **sobre el tramo posterior** y
+dilo.
+
 ## Por qué no se puede saltar
 
 Un umbral de **2 horas** de permanencia en origen pinta de rojo una operación entera

@@ -16,6 +16,24 @@ arrancaron, dónde hay una permanencia rara. Es del día.
 Ésta te dice **qué significa** y **qué conviene hacer**, mirando un período largo. Es
 para sentarse a decidir, no para resolver la mañana.
 
+## Cada hallazgo te dice quién lo arregla
+
+Es lo que hace que el informe sirva. Un mismo síntoma puede ser de tres dueños
+distintos:
+
+- **Plataforma** — lo arregla DriveTech. Vos no podés, y si el informe no lo dijera,
+  perderías tiempo intentándolo.
+- **Configuración** — lo arreglás vos en tu cuenta. Es lo más rápido y lo que más se
+  pasa por alto.
+- **Operación** — lo cambia la gente que mueve camiones. Es lo más caro y lo más lento.
+
+Un caso real: una cobertura de datos del 78 % **parecía** que había geocercas mal
+dibujadas, y era un problema de la plataforma **que ya estaba arreglado**. Sin esa
+distinción, el informe mandaba a redibujar polígonos sanos.
+
+Los hallazgos de plataforma además salen en una sección aparte al final, lista para
+mandarnos a nosotros.
+
 ## La primera vez no te va a dar un informe
 
 Y es a propósito. La primera corrida **calibra**: te muestra cómo se distribuyen de
@@ -31,8 +49,8 @@ informes.
 
 ## Los cuatro capítulos
 
-**1 · El instrumento.** Antes de mostrarte un solo promedio, te dice **cuánto de tu
-operación se pudo medir**. Los tiempos salen de que el camión entre y salga de una
+**1 · El instrumento.** Antes de mostrarte un solo promedio —y antes incluso de la
+calibración— te dice **cuánto de tu operación se pudo medir**. Los tiempos salen de que el camión entre y salga de una
 geocerca; si el polígono es chico o el camión estaciona afuera, ese viaje no se midió.
 En operaciones reales, entre una de cada cuatro y una de cada siete entregas queda
 fuera.
@@ -40,15 +58,21 @@ fuera.
 Esto va primero porque cambia cómo se lee todo lo demás: **los promedios describen los
 viajes que la geocerca alcanzó a ver**, que tienden a ser los normales.
 
+También revisa si **fue el mismo instrumento durante todo el período**. Si a mitad de
+camino cambió algo —un despliegue, una geocerca redibujada—, el promedio del período
+completo es el promedio de dos operaciones distintas y no describe a ninguna. Cuando
+eso pasa, el agente te lo dice con fecha y analiza el tramo posterior en vez de
+promediar encima.
+
 **2 · La operación.** Tus tiempos reales de carga, ruta y descarga, vueltas por camión
 y jornadas. Cada número **con cuántos viajes lo respaldan**, siempre.
 
 **3 · Lo que se desvía.** Contra lo que vos dijiste que es normal, no contra un
 estándar de manual.
 
-**4 · Qué se puede hacer.** Cada propuesta con: la evidencia, qué efecto esperar, y
-**qué se rompe si lo hacés**. Esa última parte es la que hace que sea una decisión y no
-una lista de deseos.
+**4 · Qué se puede hacer.** Cada propuesta con: la evidencia, qué efecto esperar,
+**quién lo arregla**, y **qué se rompe si lo hacés**. Esa última parte es la que hace
+que sea una decisión y no una lista de deseos.
 
 ## Sobre los conductores
 

@@ -16,9 +16,15 @@ la primera.
 
 ## La forma de cada hallazgo
 
-Siempre las cuatro partes, y la última es la que casi nunca se escribe:
+Siempre las cinco partes:
 
-> **Evidencia** → **consecuencia** → **qué se cambia** → **qué rompe**
+> **Evidencia** → **consecuencia** → **quién lo arregla** → **qué se cambia** → **qué rompe**
+
+Casi todo lo de este capítulo tiene dueño **configuración** —el cliente lo arregla en su
+cuenta, y por eso es el capítulo más rentable—. Pero no todo: si al mirar la evidencia
+resulta que el cliente **no puede** cambiarlo, es **plataforma**, y va también a la
+sección final que vuelve a DriveTech. Atribuirlo mal manda a alguien a pelear con una
+pantalla que no tiene ese botón.
 
 Un informe que solo propone mejoras es una lista de deseos. Uno que dice qué se rompe
 es una decisión.

@@ -243,16 +243,19 @@ los destinos repartidos entre 1 y 7 viajes cada uno. Un destino con **4 viajes y
 entrada sin salida** se reporta como *"pierde el 25 % de las salidas"*: aritméticamente
 correcto, y no significa nada. Es **un** viaje.
 
-Antes de nombrar un destino, un origen, una geocerca o una persona, **mira el `n` de esa
-fila, no el del período**. Por debajo de **~10 casos, no lo nombres**: di que el período
-no alcanza para desglosar y **propón uno más largo**. El agregado sigue siendo válido y
-se reporta igual.
+**No tienes que calcularlo:** cada fila de `origenes`, `destinos` y `conductores` trae
+**`muestra_chica`**, y la sección trae **`muestra_chica_bajo`** con el umbral que se
+usó. Una fila marcada **no se nombra**: di que el período no alcanza para desglosar,
+**nombra el umbral con el valor que vino** (no lo inventes ni lo redondees) y **propón
+una ventana más larga**. El agregado sigue siendo válido y se reporta igual.
 
-**Y ojo con confiar en el filtro de conductores para esto.** `min_trips` corta **por
-conductor**, así que cuando el período es corto y parejo —10 personas con ~6 viajes cada
-una— **todos pasan el corte**, `sin_muestra_suficiente` vuelve vacío, y no recibes
-ninguna señal de que el ranking completo es ruido. El umbral es por persona; el problema
-es del período. Esa lectura te toca a ti.
+**Y `muestra_chica` no es lo mismo que `min_trips`, aunque lo parezcan.** `min_trips`
+corta **por conductor**; `muestra_chica` avisa que **esa fila no sostiene una afirmación
+sobre sí misma**. Medido en un período de cuatro días: **9 conductores pasaron el corte
+de `min_trips` y los 9 estaban marcados** — pasaban el filtro y ninguno tenía muestra.
+Sin la marca, `sin_muestra_suficiente` volvía con una sola persona y **todo lo demás
+parecía sólido**. Son dos guardas distintas: no des por buena una fila porque pasó la
+otra.
 
 **Cada magnitud trae su propio `n`, y no son el mismo número.** El `n` de la permanencia
 en origen no es el de la ruta: un viaje puede tener el hito de salida y no el de
@@ -421,12 +424,12 @@ informe que le atribuye a una persona un número que produjo la operación es la
 más rápida de que lo rechacen los mismos a quienes nombra — y de que se pierda también
 lo que el informe tenía de cierto.
 
-**2 · Mínimo de viajes — y el corte de la tool no te cubre solo.** `min_trips` filtra
-**por conductor**: en un período corto y parejo, todos lo pasan y
-`sin_muestra_suficiente` vuelve vacío, sin que eso signifique que el ranking valga. Antes
-de publicar una comparación entre personas, mira si **el período** da: con ~6 viajes cada
-uno, no hay ranking que sostener, y lo correcto es decirlo y proponer una ventana más
-larga. Un ranking sobre pocos casos es ruido con aspecto de hallazgo. La tool ya separa: los que llegan al corte van en `conductores` y el resto en
+**2 · Mínimo de viajes — y las dos guardas son distintas.** Un conductor entra al
+ranking solo si pasa `min_trips` **y** no viene con `muestra_chica`. Pasar el corte no
+alcanza: en un período corto y parejo **todos lo pasan y todos vienen marcados**, y esa
+combinación significa que no hay ranking que sostener — se dice y se propone una ventana
+más larga. Un ranking sobre pocos casos es ruido con aspecto de hallazgo. La tool ya
+separa: los que llegan al corte van en `conductores` y el resto en
 `sin_muestra_suficiente`, con `min_viajes` diciendo dónde quedó la línea. **No los
 mezcles de vuelta** — y tampoco los escondas: nómbralos como lo que son, *"4 conductores
 quedaron fuera del ranking por tener menos de 5 viajes en el período"*. Si el usuario
@@ -490,8 +493,11 @@ reenvía). Si es solo de este mandante, va a su delta.
   algo que unifiques en silencio.
 - **Ningún número sin denominador.** Va pegado al número, no al pie. Y falta de dato no
   es cero.
-- **El `n` que manda es el de la celda que vas a nombrar**, no el del período. Bajo ~10
-  casos no se nombra un destino ni una persona: se dice que el período no alcanza.
+- **El `n` que manda es el de la celda que vas a nombrar**, no el del período. Una fila
+  con `muestra_chica` no se nombra: se dice que el período no alcanza y se propone una
+  ventana más larga.
+- **Pasar `min_trips` no es tener muestra.** Son dos guardas con modos de falla
+  distintos; una fila necesita las dos.
 - **Si p25 y la mediana viven en mundos distintos, son dos poblaciones**, no una con
   cola larga. No hay centro que reportar.
 - **Lo normal lo define esta empresa**, no la industria ni otro cliente. Sin

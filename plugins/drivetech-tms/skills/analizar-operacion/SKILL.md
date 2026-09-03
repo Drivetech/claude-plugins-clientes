@@ -235,6 +235,25 @@ destino, ruta y desvío de carga** como **p25 / mediana / p75 / p90 — cada uno
 `_n` propio**, el bloque `hora_de_carga`, las `vueltas_por_vehiculo_dia` y la
 `jornada_min`.
 
+### El `n` que manda es el de la celda que vas a nombrar
+
+**Un período puede aguantar el agregado y no aguantar el desglose**, y la respuesta no
+distingue una cosa de la otra. Caso real: 65 viajes en cuatro días —agregado sólido— con
+los destinos repartidos entre 1 y 7 viajes cada uno. Un destino con **4 viajes y 1
+entrada sin salida** se reporta como *"pierde el 25 % de las salidas"*: aritméticamente
+correcto, y no significa nada. Es **un** viaje.
+
+Antes de nombrar un destino, un origen, una geocerca o una persona, **mira el `n` de esa
+fila, no el del período**. Por debajo de **~10 casos, no lo nombres**: di que el período
+no alcanza para desglosar y **propón uno más largo**. El agregado sigue siendo válido y
+se reporta igual.
+
+**Y ojo con confiar en el filtro de conductores para esto.** `min_trips` corta **por
+conductor**, así que cuando el período es corto y parejo —10 personas con ~6 viajes cada
+una— **todos pasan el corte**, `sin_muestra_suficiente` vuelve vacío, y no recibes
+ninguna señal de que el ranking completo es ruido. El umbral es por persona; el problema
+es del período. Esa lectura te toca a ti.
+
 **Cada magnitud trae su propio `n`, y no son el mismo número.** El `n` de la permanencia
 en origen no es el de la ruta: un viaje puede tener el hito de salida y no el de
 llegada. Usa el `n` de cada magnitud junto a esa magnitud, nunca el total de viajes
@@ -252,6 +271,12 @@ Tres cosas más:
   mediana y los cuartiles dicen la **forma** de la distribución, y el promedio la
   esconde. Si el usuario pide el promedio, dáselo con la mediana al lado; si difieren
   mucho, **eso es el hallazgo**, no un detalle de método.
+- **Cuando p25 y la mediana viven en mundos distintos, no hay un centro que reportar.**
+  Hay **dos poblaciones**, y decir "la mediana es X" las promedia en un número que no
+  describe a ninguna. Caso real de permanencia en origen: **p25 = 19 minutos, mediana =
+  562, p90 = 2.393** (casi 40 horas). Ahí la mediana ya cayó del lado del pernocte: no
+  es una cola larga, son dos operaciones distintas —cargar y dormir en planta— metidas
+  en la misma columna. Dilo así, y segmenta o reporta las dos.
 - **Segmenta por lo que la operación distingue**: origen, ruta, tipo de vehículo,
   primera vuelta contra segunda. Un promedio general sobre rutas heterogéneas no
   describe ninguna.
@@ -396,8 +421,12 @@ informe que le atribuye a una persona un número que produjo la operación es la
 más rápida de que lo rechacen los mismos a quienes nombra — y de que se pierda también
 lo que el informe tenía de cierto.
 
-**2 · Mínimo de viajes.** Un ranking sobre pocos casos es ruido con aspecto de
-hallazgo. La tool ya separa: los que llegan al corte van en `conductores` y el resto en
+**2 · Mínimo de viajes — y el corte de la tool no te cubre solo.** `min_trips` filtra
+**por conductor**: en un período corto y parejo, todos lo pasan y
+`sin_muestra_suficiente` vuelve vacío, sin que eso signifique que el ranking valga. Antes
+de publicar una comparación entre personas, mira si **el período** da: con ~6 viajes cada
+uno, no hay ranking que sostener, y lo correcto es decirlo y proponer una ventana más
+larga. Un ranking sobre pocos casos es ruido con aspecto de hallazgo. La tool ya separa: los que llegan al corte van en `conductores` y el resto en
 `sin_muestra_suficiente`, con `min_viajes` diciendo dónde quedó la línea. **No los
 mezcles de vuelta** — y tampoco los escondas: nómbralos como lo que son, *"4 conductores
 quedaron fuera del ranking por tener menos de 5 viajes en el período"*. Si el usuario
@@ -461,6 +490,10 @@ reenvía). Si es solo de este mandante, va a su delta.
   algo que unifiques en silencio.
 - **Ningún número sin denominador.** Va pegado al número, no al pie. Y falta de dato no
   es cero.
+- **El `n` que manda es el de la celda que vas a nombrar**, no el del período. Bajo ~10
+  casos no se nombra un destino ni una persona: se dice que el período no alcanza.
+- **Si p25 y la mediana viven en mundos distintos, son dos poblaciones**, no una con
+  cola larga. No hay centro que reportar.
 - **Lo normal lo define esta empresa**, no la industria ni otro cliente. Sin
   calibración no hay capítulo 3 — y sin capítulo 1, la calibración fija el sesgo como
   normal.

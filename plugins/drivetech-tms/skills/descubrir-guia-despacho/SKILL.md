@@ -155,6 +155,11 @@ Lo que más se olvida:
   mirar.
 - **Nunca inventes** un rótulo, un ejemplo ni una ubicación. Lo cortado, borroso o
   tapado es **duda**, y la duda se escribe como pregunta concreta.
+- **Un rótulo puede mentir** (regla 8). El rótulo está impreso y es real, pero el valor
+  debajo no siempre es del tipo que anuncia. Antes de escribir *"X va bajo el rótulo
+  Y"*, mira si el valor **tiene la forma de X**. Confiar en el rótulo falla dos veces
+  con un solo error: deja un cruce que va a fallar siempre, y deja sin describir el
+  identificador que en realidad estaba ahí.
 
 Con varias muestras, **contrasta**: lo que aparece igual en todas es del formulario;
 lo que cambia es del documento. No escribas como regla lo que viste una sola vez.
@@ -239,10 +244,23 @@ buscarlas:
    número **del mismo documento** y lo escribió.
 2. **El folio de guía o factura que el viaje trae del ERP del mandante**, cuando está
    poblado. En un mandante real venía en 2.146 de 2.185 entregas.
+3. **Las cantidades facturadas del ERP** (`planvsbilled` del viaje), contra la columna
+   de cantidad de la tabla de ítems del papel.
 
-Busca esos dos **antes de darte por vencido**. El paso parece imposible si lo lees como
+Busca los tres **antes de darte por vencido**. El paso parece imposible si lo lees como
 "comparar todo contra lo digitado", y es perfectamente posible si sabes que lo que se
 contrasta es, casi siempre, **un campo**.
+
+**La tercera no es un repuesto de las otras dos: cubre otra parte del documento.** Las
+dos primeras verifican **el folio**; ninguna verifica **la tabla de ítems**. En un
+formato donde los ítems son casi todo el papel, comprobar solo el folio deja el grueso
+sin verificar. Y tiene una ventaja propia: **varias cantidades coincidiendo es más
+fuerte que un número**, porque acertar tres veces por azar es mucho más difícil que
+acertar una.
+
+Un caso real: un mandante sin campo de referencia en su formulario y con el folio del
+ERP **no impreso** en el papel. Por las dos primeras fuentes, el golden sample "no se
+podía hacer". Con las cantidades facturadas, 3 de 3.
 
 ### Qué hacer con el resultado
 
@@ -250,7 +268,7 @@ Si no calza, el que está mal es tu lectura, no el humano: corrige la spec y vue
 mirar. Y si el desacuerdo es **sistemático** (siempre el mismo campo, siempre igual),
 eso no es error de lectura — es que la spec dice que el dato está donde no está.
 
-Si el mandante **no tiene ninguno de los dos**, entonces sí: el golden sample no se
+Si el mandante **no tiene ninguna de las tres**, entonces sí: el golden sample no se
 puede hacer. **Dilo** — quedó sin hacer y la spec vale menos. No lo omitas en
 silencio.
 
@@ -381,9 +399,12 @@ la respuesta no es "no se puede", es "falta esta pieza y así se vería cuando e
 - **El encabezado de evidencia es una barrera, no un comentario.** Va siempre.
 - **Las banderas quedan apagadas y se dice.** Prenderlas exige tasas medidas, no una
   observación sobre tres papeles.
-- **El golden sample se contrasta contra lo que digitó una persona** —el campo de
-  referencia del formulario, el folio del ERP—, no contra lo que puso el sistema. Eso
-  último es el cruce de validación, no una verificación de tu lectura.
+- **El golden sample se contrasta contra lo que digitó una persona o trajo el ERP del
+  mandante** —el campo de referencia del formulario, el folio, las cantidades
+  facturadas—, no contra lo que puso el sistema al crear el viaje. Eso último es el
+  cruce de validación, no una verificación de tu lectura.
+- **Un rótulo puede mentir.** Confirma que el valor tenga la forma del dato que el
+  rótulo anuncia, antes de escribir dónde vive ese dato.
 - **Una estructura repetida en el papel no significa que la operación la use.** Es
   duda, no regla.
 - **El golden sample no es opcional**, y si no se pudo hacer, se dice.

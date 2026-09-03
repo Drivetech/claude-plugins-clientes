@@ -106,7 +106,16 @@ dejan de ser lo mismo y nadie se entera.
    de verdad (*"Tiendas a visitar: 00001"*, *"Bultos: 3"*, *"Página 1 de 1"*). Si lo
    encuentras, la duda **tiene respuesta en el papel** y no hay que preguntar nada:
    escribe dónde está ese contador y qué significa.
-8. **La especificación es el texto principal** y el que se guarda. Completo y
+8. **Un rótulo puede mentir sobre lo que contiene.** El rótulo es real y está
+   impreso, pero el valor debajo no siempre es del tipo que anuncia: una columna
+   rotulada *"Camión"* puede traer el número del viaje y no una patente. Antes de
+   escribir *"el dato X va bajo el rótulo Y"*, confirma que el valor tenga la **forma**
+   de X: una patente parece una patente, una fecha parece una fecha, un RUT tiene
+   dígito verificador. Si no calza, describe lo que hay de verdad y dilo explícito:
+   *"bajo el rótulo «Camión» NO va la patente, va el número del viaje"*. Esa línea
+   **vale doble**: evita un cruce que fallaría siempre, y además rescata un
+   identificador que si no queda sin describir.
+9. **La especificación es el texto principal** y el que se guarda. Completo y
    ordenado, y que se pueda leer de corrido sin haber visto el papel.
 
 ## Cómo se escribe

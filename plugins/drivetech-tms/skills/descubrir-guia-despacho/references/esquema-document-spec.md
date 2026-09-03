@@ -6,8 +6,10 @@ pantalla de creación de mandante del front); lo lee la **validación documental
 automática**, que lo recibe en su contexto y donde **manda sobre su criterio
 genérico**. Si cambia el contrato, sube `esquema` y revisa a los dos consumidores.
 
-Vive en el campo `document_spec` del mandante. Es texto libre con un encabezado
-estructurado adelante.
+Vive en el campo `document_spec` **del mandante** cuando la cuenta es transportista y
+cada cliente trae su formulario, o **de la cuenta** cuando es ella la que emite sus
+guías y el formato es uno solo. Son dos niveles excluyentes; cuál corresponde lo
+dicta la tool que guarda. Es texto libre con un encabezado estructurado adelante.
 
 ---
 

@@ -6,8 +6,8 @@ description: >-
   dónde va el folio, el código de cliente, la patente, la tabla de ítems, y qué no
   trae. Trabaja sobre 2-3 guías reales del mandante y las pistas del usuario, valida
   contra guías ya digitadas a mano, y guarda el resultado en el `document_spec` del
-  mandante con set_mandante_document_spec, que después usa la validación documental
-  automática. Deja las banderas de cruce apagadas y lo dice: autorizar un rechazo
+  mandante —o de la cuenta, si es ella la que emite sus guías— con set_document_spec,
+  que después usa la validación documental automática. Deja las banderas de cruce apagadas y lo dice: autorizar un rechazo
   automático necesita tasas medidas sobre el histórico, que hoy no se pueden calcular
   desde acá. Úsala cuando pidan "descubrir el formato de la guía de X", "documentar
   la guía de despacho", "configurar la validación de documentos de un mandante",
@@ -69,8 +69,8 @@ las banderas quedan en cero **a propósito y dicho**, no por accidente.
   esperada, `select_enterprise`) — la selección se vence sola y el error que aparece
   después dice *"la empresa no tiene contratado el módulo de tms"*, que parece un
   problema de permisos y no lo es.
-- **`set_mandante_document_spec`** — la tool que guarda. Si no está en tu listado,
-  esta instalación no puede guardar lo que descubras: dile al usuario y no arranques.
+- **`set_document_spec`** — la tool que guarda. Si no está en tu listado, esta
+  instalación no puede guardar lo que descubras: dile al usuario y no arranques.
   Descubrir sin poder guardar es trabajo que se pierde al cerrar la sesión.
 - **2–3 guías reales** del mandante, ya emitidas. Las aporta el usuario.
 
@@ -92,18 +92,26 @@ Trae el mandante con `get_backlog_settings(slug=…)`: el GET ya devuelve el
   de tocar nada y trabaja por diff (Paso 5). Puede tener correcciones que hizo el
   operador a mano, que no salen de ningún descubrimiento y no se pisan.
 
-### Quién emite el documento
+### Quién emite el documento, y dónde va la spec
 
-El formato lo pone **quien emite la guía**, y eso lo declara la empresa en
-`document_issued_by`; **no lo infieras** — deducirlo de "¿tiene mandantes?" es
-justamente el proxy que se rompe.
+El formato lo pone **quien emite la guía**, y eso define **dos niveles excluyentes**:
 
-- **`mandante`** (cuenta transportista) — cada mandante trae su propio formulario. Es
-  el caso de esta skill: la spec vive en el mandante.
-- **`enterprise`** (la cuenta emite sus propias guías) — el formato es uno solo para
-  toda la empresa, las banderas del mandante no se usan, y lo que descubras va al
-  nivel de empresa. **Si estás acá, dilo y detente**: esta skill escribe en el
-  mandante y sería el lugar equivocado.
+- **La cuenta es transportista** (`document_issued_by: mandante`) — cada cliente que
+  la contrata trae su propio formulario. La spec va **en el mandante**: se guarda
+  **con `slug`**.
+- **La cuenta emite sus propias guías** (`document_issued_by: enterprise`) — el
+  formato es **uno solo para todos sus clientes**. La spec va **en la cuenta**: se
+  guarda **sin `slug`**. Ojo con el encuadre: acá no estás descubriendo el formulario
+  *de un mandante*, sino **el de la cuenta**, aunque hayas llegado mirando la guía de
+  un destino puntual. Dilo así, o el usuario va a creer que configuró un cliente.
+
+**No lo adivines ni se lo preguntes al usuario.** Mira `document_issued_by` para saber
+qué esperar — y déjalo ahí: **la autoridad es la tool**. `set_document_spec` rechaza el
+nivel que no corresponde, y el mensaje del rechazo dice cuál es el de esta cuenta. El
+flujo correcto es **intentar y leer el rechazo**, no razonar por adelantado.
+
+Un rechazo de ese tipo **no es un error tuyo ni una falla de la skill**: es la
+respuesta a la pregunta. Corrige el nivel y vuelve a llamar.
 
 ---
 
@@ -244,15 +252,37 @@ lado** y lo lee como barrera: con `evidencia: muestras`, **ninguna bandera de cr
 aplica** aunque esté prendida. No lo escribas de memoria y no lo omitas — sin
 encabezado se asume sin evidencia.
 
-Guarda con **`set_mandante_document_spec`**: `slug`, `document_spec`, y si los
-descubriste y faltaban, `business_name` y `rut` — son lo que hace que el cruce del
+Guarda con **`set_document_spec`**, en el nivel que corresponda (Paso 0):
+
+- **Con `slug`** — la spec es de ese mandante.
+- **Sin `slug`** — la spec es de la cuenta, porque es ella la que emite. En este caso
+  **no va identidad**: `business_name` y `rut` son de un mandante, y una cuenta se
+  conoce a sí misma.
+
+Si te equivocaste de nivel, la tool rechaza y el mensaje dice cuál corresponde:
+corrige y vuelve a llamar.
+
+**La identidad siempre pasa.** La razón social y el RUT de un mandante se pueden
+escribir en los dos tipos de cuenta — lo que cambia de nivel es el **formato**, no la
+identidad. Guárdalos si los descubriste y faltaban: son lo que hace que el cruce del
 destino funcione cuando el papel dice *"Embotelladora Andina S.A."* y el TMS dice
-*"Rancagua KOA"*. Las seis banderas van por nombre.
+*"Rancagua KOA"*.
 
 **Hace merge por campo:** lo que no mandas no se toca, así que —a diferencia de
 `upsert_backlog_mandante`— no hay riesgo de borrar lo que no viste. Un `false`
 explícito en una bandera **sí** se escribe: apagar un cruce es una decisión, no una
 omisión.
+
+**Sin `slug` hay control de versión.** Si alguien tocó la configuración de la cuenta
+mientras preparabas la tuya, la tool devuelve `resultado: "conflicto"` con lo vigente.
+**No reintentes**: un reintento a ciegas es exactamente el pisotón que la versión
+existe para evitar. Lee lo que volvió, mira si tu cambio sigue teniendo sentido sobre
+esa base, y decide — o cuéntaselo al usuario. Recién ahí volvés a llamar.
+
+**Si la puerta de cuenta responde 404**, no concluyas que el nivel está mal: hoy
+producción puede estar corriendo una imagen anterior a ese endpoint. Díselo al usuario
+tal cual —la spec quedó sin guardar por una versión del servidor, no por lo que
+descubriste— y **no busques otra forma de escribirla**.
 
 **No prendas banderas.** Si el usuario te pide prender alguna igual, adviértele: la
 tool devuelve una advertencia cuando se prenden banderas sobre una spec que no dice
@@ -276,6 +306,12 @@ Dilo derecho, sin adornarlo:
 Y déjale dicho **qué habría que medir** en este mandante para poder exigir algo —
 cuáles identificadores se ven prometedores en el papel y cuáles claramente no están.
 Eso es lo que va a orientar la medición el día que se pueda correr.
+
+**Y decile cómo se va a enterar de que hay que rehacer esto.** No hace falta que lo
+vigile: cuando la validación lee un documento con esta spec y el dato no está donde
+ella dice, **lo reporta como desajuste**. Un desajuste suelto es ruido; varios seguidos
+en el mismo campo son la señal de que el mandante cambió su formulario. Ahí se vuelve
+a correr esta skill.
 
 La skill no se queda a medias por accidente: se queda a medias **a propósito y dicho**.
 
@@ -333,4 +369,8 @@ la respuesta no es "no se puede", es "falta esta pieza y así se vería cuando e
 - **El golden sample no es opcional**, y si no se pudo hacer, se dice.
 - **Lo que quedó en duda se escribe** en la spec, con quién lo resuelve. Las reglas
   persisten solas; las dudas se evaporan si no las escribes.
-- **La spec vive en el mandante** (o en la empresa, si ella emite), nunca en la skill.
+- **El nivel lo dicta la tool, no tu razonamiento.** Intenta y lee el rechazo: te dice
+  cuál corresponde. Un rechazo de nivel no es una falla de la skill.
+- **Sin `slug` no va identidad**, y un `conflicto` no se reintenta: se relee y se
+  decide.
+- **La spec vive en el mandante** (o en la cuenta, si ella emite), nunca en la skill.

@@ -14,6 +14,11 @@ Este archivo es para **la persona**. El agente lee `SKILL.md`.
 - Se están **rechazando guías que estaban buenas** y hay que entender por qué.
 - El mandante **cambió su formulario**.
 
+Si tu empresa **emite sus propias guías** en vez de recibirlas de quien la contrata,
+el formulario es uno solo para todos tus clientes: el agente lo detecta y guarda la
+especificación a nivel de tu cuenta, no de un cliente en particular. Te lo va a decir
+al guardar.
+
 **No es lo mismo que `descubrir-mandante`.** Esa configura cómo el mandante te **pide
 viajes**; ésta, cómo se lee el **papel que firma el que recibe**. Se rehacen en
 momentos distintos y no hace falta correr las dos juntas.

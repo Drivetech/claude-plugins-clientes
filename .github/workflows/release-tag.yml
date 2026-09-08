@@ -78,3 +78,53 @@ jobs:
           done
 
           echo "Tags creados: $creados"
+
+      - name: Publicar el release con el plugin empaquetado
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          publicados=0
+
+          # recorre los plugins, no los tags recien creados: asi tambien cubre un
+          # tag que quedo sin release (por ejemplo si se tageo a mano con el CLI)
+          for manifest in plugins/*/.claude-plugin/plugin.json; do
+            nombre=$(jq -r '.name'    "$manifest")
+            version=$(jq -r '.version' "$manifest")
+            tag="$nombre--v$version"
+
+            if ! git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
+              echo "- $tag no existe todavia, lo saltea"
+              continue
+            fi
+
+            if gh release view "$tag" >/dev/null 2>&1; then
+              echo "- $tag ya tiene release"
+              continue
+            fi
+
+            zip_path="$RUNNER_TEMP/$nombre.zip"
+            rm -f "$zip_path"
+
+            # el zip se arma desde la raiz del plugin: el uploader del Desktop
+            # espera .claude-plugin/plugin.json en el primer nivel del archivo
+            ( cd "plugins/$nombre" && zip -qr "$zip_path" . -x '.DS_Store' -x '*/.DS_Store' )
+
+            notas="$RUNNER_TEMP/notas-$nombre.md"
+            {
+              echo "**Desde el marketplace:** agregar \`$REPO\` en Ajustes -> Plugins."
+              echo
+              echo "**A mano**, si el marketplace todavia no ofrece esta version: descargar \`$nombre.zip\` de este release y subirlo con Agregar -> Subir plugin."
+              echo
+              echo "La ultima version siempre esta en:"
+              echo "https://github.com/$REPO/releases/latest/download/$nombre.zip"
+            } > "$notas"
+
+            echo "- publicando release $tag con $nombre.zip"
+            gh release create "$tag" "$zip_path" --title "$nombre $version" --notes-file "$notas"
+            publicados=$((publicados + 1))
+          done
+
+          echo "Releases publicados: $publicados"

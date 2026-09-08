@@ -1,0 +1,76 @@
+name: Tag de release de plugins
+
+# Publica el marcador de release que el marketplace usa para detectar que hay
+# version nueva. Cada vez que sube a main un plugins/*/.claude-plugin/plugin.json
+# con un "version" que todavia no tiene tag, crea y pushea {name}--v{version}.
+#
+# El repo vivio 17 commits sin un solo tag y el cliente se quedo clavado en la
+# version del primer sync; esto es lo que evita que vuelva a pasar.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'plugins/*/.claude-plugin/plugin.json'
+      - '.claude-plugin/marketplace.json'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Crear el tag de cada plugin cuya version no este tageada
+        run: |
+          set -euo pipefail
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          creados=0
+
+          for manifest in plugins/*/.claude-plugin/plugin.json; do
+            nombre=$(jq -r '.name'    "$manifest")
+            version=$(jq -r '.version' "$manifest")
+
+            if [ -z "$version" ] || [ "$version" = "null" ]; then
+              echo "::error file=$manifest::$nombre no declara \"version\" en plugin.json"
+              exit 1
+            fi
+
+            # El marketplace tiene que anunciar la misma version que el plugin:
+            # si mienten entre si, el cliente no sabe a que actualizar.
+            declarada=$(jq -r --arg n "$nombre" \
+              '.plugins[] | select(.name == $n) | .version // empty' \
+              .claude-plugin/marketplace.json)
+
+            if [ -z "$declarada" ]; then
+              echo "::error file=.claude-plugin/marketplace.json::la entrada de $nombre no declara \"version\""
+              exit 1
+            fi
+
+            if [ "$declarada" != "$version" ]; then
+              echo "::error file=.claude-plugin/marketplace.json::$nombre: el marketplace anuncia $declarada y plugin.json dice $version"
+              exit 1
+            fi
+
+            tag="$nombre--v$version"
+
+            if git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
+              echo "· $tag ya existe — nada que hacer"
+              continue
+            fi
+
+            echo "· creando $tag"
+            git tag -a "$tag" -m "$nombre $version"
+            git push origin "refs/tags/$tag"
+            creados=$((creados + 1))
+          done
+
+          echo "Tags creados: $creados"

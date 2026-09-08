@@ -5,16 +5,13 @@ description: >-
   de Drivetech. Da el panorama del día (estado de cada viaje, hora comprometida,
   ETA, permanencia en origen/destino, tiempo en ruta), detecta anomalías (atrasos,
   viajes sin iniciar, permanencias o rutas demasiado largas, GPS sin reportar) y
-  audita contra geocercas para distinguir un problema real de un problema de
-  geocerca (el viaje se inicia/cierra con la entrada/salida a las geocercas de
-  origen y destino, y eso a veces falla). Consulta el manual del centro de
-  conocimiento sobre inicio/cierre automático de guías para no confundir el
-  comportamiento normal con un problema, y cuando la causa es la geocerca recomienda
-  ajustarla. Sirve tanto a la empresa de transporte
-  (vista interna) como para armarle el estado al mandante. Úsala cuando pidan
-  "cómo va la operación", "revisar los viajes de hoy", "el estado del día",
-  "estadías", "tiempos en ruta", "qué viajes están atrasados", "auditar un viaje",
-  "problemas de geocerca", o el reporte de avance para el mandante.
+  audita contra geocercas para distinguir un problema real de uno de geocerca: el
+  viaje se inicia y cierra con la entrada/salida a las geocercas de origen y
+  destino, y eso a veces falla. Sirve a la empresa de transporte (vista interna) y
+  para armarle el estado al mandante. Úsala cuando pidan "cómo va la operación",
+  "revisar los viajes de hoy", "el estado del día", "estadías", "tiempos en ruta",
+  "qué viajes están atrasados", "auditar un viaje", "problemas de geocerca", o el
+  reporte de avance para el mandante.
 ---
 
 # Seguimiento de la operación

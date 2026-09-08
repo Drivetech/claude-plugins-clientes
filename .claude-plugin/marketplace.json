@@ -9,7 +9,7 @@
     {
       "name": "drivetech-tms",
       "source": "./plugins/drivetech-tms",
-      "version": "0.2.4",
+      "version": "0.2.5",
       "displayName": "Operación TMS",
       "description": "Automatiza la operación diaria sobre el TMS de Drivetech: descubre el formato de viajes de cada mandante (onboarding), los carga al backlog y asigna, hace el seguimiento intradía (estado, anomalías, auditoría de geocercas), descubre cómo se lee la guía de despacho de cada mandante para la validación documental, y analiza la operación sobre un período para proponer qué cambiar. Sirve a mandantes de carga (intake por archivo) y a empresas de transporte (intake por correo).",
       "category": "logistics",

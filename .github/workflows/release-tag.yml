@@ -12,6 +12,7 @@ on:
     branches: [main]
     paths:
       - 'plugins/*/.claude-plugin/plugin.json'
+      - 'plugins/*/skills/*/SKILL.md'
       - '.claude-plugin/marketplace.json'
   workflow_dispatch:
 
@@ -25,6 +26,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Ningun description de skill puede pasar los 1024 caracteres
+        run: python3 .github/scripts/check-skill-descriptions.py
 
       - name: Crear el tag de cada plugin cuya version no este tageada
         run: |

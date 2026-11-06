@@ -276,11 +276,38 @@ Arma un resumen para el usuario:
 
 ## Paso 5 · Cargar al backlog
 
-Llama a `create_backlog_trips` con **todos** los viajes en una sola llamada. La
-primera vez que proceses una solicitud nueva, conviene una pasada con
-`dry_run=true` para revisar la clasificación antes de escribir.
+Cargar toma **dos llamadas** a `create_backlog_trips`, siempre con **todos** los
+viajes juntos:
 
-Interpreta la respuesta por canasta:
+1. **Simular.** La primera llamada **no carga nada**: con `dry_run=true`, o con
+   `dry_run=false` pero sin `confirmation_token`, solo simula. Cualquiera de las
+   dos sirve y entrega el mismo token para la misma lista. Devuelve
+   `would_create`, `needs_clarification`, `already_loaded` y un
+   `confirmation_token`. Si `would_create` viene vacío (todo quedó en
+   `needs_clarification` o `already_loaded`), **no hay token** porque no hay nada
+   que cargar: resuelve las dudas y simula de nuevo.
+2. **Confirmar.** Repite la llamada con **los mismos viajes**, `dry_run=false` y
+   ese `confirmation_token`. Recién ahí se cargan y la respuesta trae `created`.
+
+El token corresponde a esa lista exacta de viajes: la misma lista da siempre el
+mismo token. Si cambias **cualquier** viaje entre una llamada y otra (quitas uno,
+corriges una guía, resuelves un destino), el token deja de calzar y la llamada
+vuelve a simular en vez de cargar. Cuando la respuesta no trae `created` sino
+`would_create`, no se cargó nada: toma el token nuevo y confirma de nuevo.
+
+Quién confirma depende de `auto_crear` (Paso 4):
+- `auto_crear = true` → confirma tú mismo en la misma corrida, sin preguntarle a
+  nadie.
+- `auto_crear = false` → muéstrale al usuario el resultado de la simulación
+  (lo que se va a crear y lo que tiene dudas) y confirma solo con su OK.
+
+Antes de confirmar, resuelve lo que la simulación dejó en `needs_clarification` y
+`already_loaded` (5.1): si cambias la lista, simula de nuevo y usa el token nuevo.
+Si decides cargar ya lo que está limpio y dejar las dudas para después, esa
+lista más corta también es otra lista: simúlala para tener su token.
+
+Interpreta cada respuesta por canasta:
+- **would_create** — (solo en la simulación) lo que se cargaría al confirmar.
 - **created** — cargados. Cuéntalos.
 - **needs_clarification** — nombre ambiguo o no encontrado (trae candidatos).
   No se cargaron: resuélvelos con `get_tms_catalog` o pregúntale al usuario.
@@ -303,9 +330,12 @@ cargados vuelven como `already_loaded`. Solo significa que la próxima corrida
 volverá a revisar lo mismo.
 
 Dos avisos sobre timeouts de api-v2:
-- Si la respuesta viene como **indeterminate**, NO afirmes que falló. Vuelve a
-  llamar a `create_backlog_trips` con los mismos viajes: los que sí quedaron
-  aparecen como `already_loaded` y los que no, se cargan. Reintentar no duplica.
+- Si la respuesta de la confirmación viene como **indeterminate**, NO afirmes que
+  falló. Vuelve a llamar a `create_backlog_trips` con los mismos viajes y el mismo
+  `confirmation_token` (la lista no cambió, así que sigue calzando): los que sí
+  quedaron aparecen como `already_loaded` y los que no, se cargan. Reintentar no
+  duplica. Si en vez de cargar vuelve a simular, la lista cambió en algo: confirma
+  con el token nuevo.
 - `get_trip_status` **no sirve para verificar de inmediato** después de un
   timeout: hay lag y puede devolver `not_found` para viajes que sí se
   escribieron. Confía en el reintento de `create_backlog_trips`.
@@ -320,8 +350,10 @@ repiten o se equivocan en el número de guía. Por **cada** viaje en
 2. **"Es un error del mandante, corrige el número"** → pídele el **nuevo número
    de guía** y cámbiaselo. Queda pendiente de cargar con el código corregido.
 
-Cuando hayas resuelto todas, **vuelve a llamar `create_backlog_trips`** con la
-lista actualizada. Reintentar es idempotente: los ya cargados vuelven como
+Cuando hayas resuelto todas, la lista cambió: **simula de nuevo** con
+`create_backlog_trips` y la lista actualizada (sin token), y confirma con el
+`confirmation_token` nuevo que te devuelve. El token anterior ya no sirve para
+esta lista. Reintentar es idempotente: los ya cargados vuelven como
 `already_loaded` y se saltan solos. Repite hasta que quede vacío.
 
 Informa al usuario:
@@ -753,6 +785,6 @@ un perfil bien hecho para copiar. Lo mínimo que no puedes saltarte:
 - Trabaja sobre **una muestra real ya recibida**, no sobre lo que el usuario te
   cuente que trae.
 - Hazle **confirmar el mapeo** antes de guardar; lo que no reconozcas, pregúntalo.
-- Valida con **un viaje** (`dry_run=true`, después real) y **revisa en la
-  plataforma** que la hora comprometida se vea como en la solicitud. Si aparece
+- Valida con **un viaje** (primero simula, después confirma con el
+  `confirmation_token`) y **revisa en la plataforma** que la hora comprometida se vea como en la solicitud. Si aparece
   corrida, estás convirtiendo la hora dos veces.

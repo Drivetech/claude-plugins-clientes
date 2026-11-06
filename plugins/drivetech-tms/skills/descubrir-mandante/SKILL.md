@@ -222,16 +222,20 @@ Este paso es el que atrapa los inventos antes de que lleguen al backlog.
 
 Valida el mapeo con datos reales, en chico:
 
-1. Arma **1–2 viajes** de la muestra y llama a `create_backlog_trips` con
-   `dry_run=true`. Revisa que la clasificación quede como esperas.
+1. Arma **1–2 viajes** de la muestra y llama a `create_backlog_trips` sin
+   `confirmation_token`: esa llamada solo simula, no carga nada. Revisa que la
+   clasificación quede como esperas.
 2. Si el mandante **ya tiene viajes cargados** en la plataforma (onboarding de
    algo que hoy se hace a mano), compara tu resultado contra uno real ya
    existente: `code`, `origin`, `skills_required` y sobre todo la **hora
    comprometida** deben calzar. Si no calzan, el mapeo está mal — arréglalo antes
    de seguir.
-3. Si el usuario lo aprueba, haz **una** carga real de ese viaje de prueba y
-   **revisa en la plataforma** que la hora comprometida se vea igual que en la
-   muestra (p.ej. 07:00, no 11:00). Una hora corrida = doble conversión.
+3. Si el usuario lo aprueba, haz **una** carga real de ese viaje de prueba:
+   repite la llamada con el mismo viaje, `dry_run=false` y el
+   `confirmation_token` que te devolvió la simulación (sin token, la llamada
+   solo simula y no carga). Después **revisa en la plataforma** que la hora
+   comprometida se vea igual que en la muestra (p.ej. 07:00, no 11:00). Una
+   hora corrida = doble conversión.
 
 No cargues todo el lote aquí: esto es validación. La carga del día es trabajo de
 la skill `cargar-viajes-backlog`.

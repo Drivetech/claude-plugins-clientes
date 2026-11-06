@@ -106,8 +106,8 @@ Lo que hay que dejar acordado, además del formato del correo:
 - Qué se le informa de vuelta, **cada cuánto** y con qué datos.
 - Qué se hace cuando un viaje se atrasa.
 
-Después valida con una carga chica: un viaje en `dry_run`, luego real, y revisa
-en la plataforma que la **hora comprometida** se vea igual que en el correo.
+Después valida con una carga chica: un viaje simulado, luego confirmado con su
+`confirmation_token`, y revisa en la plataforma que la **hora comprometida** se vea igual que en el correo.
 
 ---
 
